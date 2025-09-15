@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Storysmith</title>
+    <!-- Primary font for Latin-based languages -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font for Urdu and other Arabic-script languages -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Social Media Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            /* Use Inter for UI, and Noto Nastaliq Urdu for generated content. The browser will automatically pick the best font for the script. */
+            font-family: 'Inter', 'Noto Nastaliq Urdu', sans-serif;
+            background-color: #1a202c; /* Deep slate background */
+            color: #e2e8f0; /* Light gray text */
+        }
+        .container {
+            max-width: 800px;
+            padding: 2rem;
+        }
+        .header-card {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%); /* Darker gradient */
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+        .card {
+            background-color: #2d3748; /* Darker card color */
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        .gradient-text {
+            background: linear-gradient(45deg, #38bdf8, #818cf8, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .button-gradient {
+            background-image: linear-gradient(to right, var(--color-from), var(--color-to));
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            font-weight: 700;
+            color: white;
+            border-radius: 9999px;
+            padding: 0.75rem 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .button-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        .button-gradient:disabled {
+            background-image: linear-gradient(to right, #4a5568, #2d3748);
+            color: #718096;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Specific button colors */
+        .btn-prompt {
+            --color-from: #3b82f6;
+            --color-to: #2563eb;
+        }
+        .btn-character {
+            --color-from: #10b981;
+            --color-to: #059669;
+        }
+        .btn-story {
+            --color-from: #8b5cf6;
+            --color-to: #6d28d9;
+        }
+        .btn-summarize {
+            --color-from: #f97316;
+            --color-to: #ea580c;
+        }
+        .btn-suggest {
+            --color-from: #d946ef;
+            --color-to: #c026d3;
+        }
+        .btn-continue {
+            --color-from: #facc15;
+            --color-to: #eab308;
+        }
+        .social-icon {
+            font-size: 1.5rem;
+            color: #93c5fd;
+            transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+        }
+        .social-icon:hover {
+            color: #3b82f6;
+            transform: scale(1.1);
+        }
+        .footer-link {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #93c5fd;
+            transition: color 0.2s ease-in-out;
+        }
+        .footer-link:hover {
+            color: #3b82f6;
+        }
+
+
+        textarea {
+            resize: none;
+            scrollbar-width: none;
+        }
+        textarea::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .output-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            font-weight: 700; /* Made all output text bold */
+        }
+        
+        /* Fade-in animation for outputs */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        /* New fade-in-up animation for suggestions */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .suggestion-item {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        /* Highlighting for audio playback */
+        .highlighted-line {
+            background-color: #4a5568; /* a darker slate-gray */
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            transition: background-color 0.3s ease-in-out;
+        }
+        .audio-icon-container {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .audio-icon-container svg {
+            width: 2rem;
+            height: 2rem;
+            color: #93c5fd; /* Lighter icon color */
+            transition: color 0.2s ease-in-out;
+        }
+        .audio-icon-container:hover svg {
+            color: #60a5fa; /* Lighter hover color */
+        }
+        .audio-icon-container .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Active category button styling */
+        .category-button.active {
+            background: linear-gradient(45deg, #3b82f6, #60a5fa);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            border: none;
+        }
+        .category-button {
+            border: 2px solid #4a5568;
+            background-color: #2d3748;
+            transition: all 0.2s ease-in-out;
+        }
+        .category-button:hover:not(.active) {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* New CSS for the category loading overlay */
+        .category-loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(26, 32, 44, 0.9); /* Darker overlay */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border-radius: 1.5rem;
+            z-index: 20;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* New loading screen animations */
+        .loading-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #93c5fd;
+            animation: pulse-title 1.5s infinite;
+        }
+        @keyframes pulse-title {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .loading-icon-container {
+            display: flex;
+            gap: 1.5rem;
+            animation: bounce-icons 2s infinite ease-in-out;
+            transform-origin: bottom;
+        }
+        @keyframes bounce-icons {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* New spinner for the category loading overlay */
+        .category-spinner {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 5px solid #4a5568;
+            border-top-color: #60a5fa; /* Lighter spinner color */
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="container mx-auto p-4 md:p-8 space-y-8">
+        
+        <!-- Header -->
+        <header class="header-card text-center p-8 mb-8">
+            <h1 class="text-4xl md:text-5xl font-extrabold gradient-text leading-tight mt-12">AI Storysmith</h1>
+            <p class="mt-4 text-lg text-gray-300">Your creative companion. Generate story prompts, characters, and complete stories in any language.</p>
+            
+            <!-- Category Navigation -->
+            <nav class="mt-6">
+                <ul class="flex justify-center flex-wrap gap-4 text-gray-300 text-sm font-semibold">
+                    <li id="generalBtn" class="category-button active px-4 py-2 rounded-full hover:bg-gray-700 transition-colors cursor-pointer" data-category="general">General Stories</li>
+                    <li id="childrensStoriesBtn" class="category-button px-4 py-2 rounded-full hover:bg-gray-700 transition-colors cursor-pointer" data-category="childrensStories">Children's Stories</li>
+                    <li id="poemsBtn" class="category-button px-4 py-2 rounded-full hover:bg-gray-700 transition-colors cursor-pointer" data-category="poems">Poems</li>
+                    <li id="riddlesBtn" class="category-button px-4 py-2 rounded-full hover:bg-gray-700 transition-colors cursor-pointer" data-category="riddles">Riddles</li>
+                    <li id="jokesBtn" class="category-button px-4 py-2 rounded-full hover:bg-gray-700 transition-colors cursor-pointer" data-category="jokes">Jokes</li>
+                    <li id="poetryBtn" class="category-button px-4 py-2 rounded-full hover:bg-gray-700 transition-colors cursor-pointer" data-category="poetry">Poetry</li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content Card -->
+        <main class="card p-8 space-y-8 relative">
+            <!-- Category Loading Overlay - New and improved -->
+            <div id="categoryLoadingOverlay" class="category-loading-overlay hidden">
+                <div class="category-spinner"></div>
+            </div>
+            <section class="space-y-4">
+                <label for="keywords" class="text-lg font-semibold block text-gray-300">Enter a few keywords and the desired language (e.g., 'a magical lake, a small deer, in Urdu')</label>
+                <textarea id="keywords" rows="3" class="w-full p-4 rounded-xl bg-gray-700 border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors placeholder:text-gray-400" placeholder="e.g., 'a magical lake, a small deer'"></textarea>
+                
+                <button id="suggestIdeasBtn" class="w-full button-gradient btn-suggest">
+                    ✨Suggest Ideas✨
+                </button>
+            </section>
+            
+            <section id="suggestionOutput" class="space-y-4 hidden">
+                <!-- Suggestions will be added here -->
+            </section>
+
+            <section class="space-y-4">
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button id="generatePromptBtn" class="flex-1 w-full sm:w-auto button-gradient btn-prompt">
+                        Generate Prompt
+                    </button>
+                    <button id="generateCharacterBtn" class="flex-1 w-full sm:w-auto button-gradient btn-character">
+                        Generate Character
+                    </button>
+                </div>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button id="generateStoryBtn" class="flex-1 w-full sm:w-auto button-gradient btn-story" disabled>
+                        Write Story
+                    </button>
+                    <button id="continueStoryBtn" class="flex-1 w-full sm:w-auto button-gradient btn-continue" disabled>
+                        ✨Continue Story✨
+                    </button>
+                </div>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button id="summarizeStoryBtn" class="flex-1 w-full sm:w-auto button-gradient btn-summarize" disabled>
+                        Summarize Story
+                    </button>
+                </div>
+            </section>
+
+            <section id="outputSection" class="space-y-8 mt-8">
+                <div id="promptOutput" class="min-h-[100px] p-6 rounded-xl bg-gray-700 border border-gray-600 shadow-inner">
+                    <p id="promptPlaceholder" class="text-gray-400 italic">Your story prompt will appear here...</p>
+                </div>
+                
+                <div id="characterOutput" class="min-h-[100px] p-6 rounded-xl bg-gray-700 border border-gray-600 shadow-inner hidden">
+                    <p id="characterPlaceholder" class="text-gray-400 italic">Your character details will appear here...</p>
+                </div>
+
+                <!-- Story Output with a dedicated loading message area -->
+                <div id="storyOutput" class="relative min-h-[200px] p-6 rounded-xl bg-gray-700 border border-gray-600 shadow-inner">
+                    <p id="storyPlaceholder" class="text-gray-400 italic">Your complete story will appear here...</p>
+                    <div id="storyLoadingMessage" class="absolute inset-0 flex items-center justify-center p-4 bg-gray-700 bg-opacity-80 rounded-xl hidden">
+                        <div class="text-center text-gray-300">
+                            <svg class="loading-spinner mx-auto mb-2 w-8 h-8 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- The audio icon container is now a sibling to the story output -->
+                <div id="audioIconContainer" class="audio-icon-container hidden" onclick="handlePlayAudio()">
+                    <!-- Play Icon -->
+                    <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 hidden">
+                        <path fill-rule="evenodd" d="M11.66 2.016a.75.75 0 0 1 .75 0l9.366 5.378a.75.75 0 0 1 0 1.284l-9.366 5.378a.75.75 0 0 1-.75 0L2.308 8.678a.75.75 0 0 1 0-1.284L11.66 2.016Z" clip-rule="evenodd" />
+                        <path d="M11.99 19.34a.75.75 0 0 1 .75 0l9.366 5.378a.75.75 0 0 1 0 1.284l-9.366 5.378a.75.75 0 0 1-.75 0L2.64 25.996a.75.75 0 0 1 0-1.284L11.99 19.34Z" />
+                    </svg>
+                    <!-- Pause Icon (hidden initially) -->
+                    <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 hidden">
+                        <path fill-rule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75V5.25Zm7.5 0A.75.75 0 0 1 15 4.5h1.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H15a.75.75 0 0 1-.75-.75V5.25Z" clip-rule="evenodd" />
+                    </svg>
+                    <!-- Loading Spinner (hidden initially) -->
+                    <svg id="loadingSpinner" class="loading-spinner w-6 h-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                </div>
+                
+                <div id="summaryOutput" class="min-h-[100px] p-6 rounded-xl bg-gray-700 border border-gray-600 shadow-inner hidden">
+                    <p id="summaryPlaceholder" class="text-gray-400 italic">Your story summary will appear here...</p>
+                </div>
+            </section>
+        </main>
+        
+        <!-- Footer -->
+    
+        <footer class="text-center text-gray-500 mt-8">
+            <div class="flex justify-center space-x-6 mb-4">
+                <a href="#" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <div class="flex justify-center space-x-4 mb-2">
+                 <a href="#" class="footer-link">About Us</a>
+                <span class="text-gray-600">|</span>
+                <a href="#" class="footer-link">Blog</a>
+                <span class="text-gray-600">|</span>
+                <a href="#" class="footer-link">Contact Us</a>
+            </div>
+            <p>Developed By: Saim Tahir</p><p>&copy; 2025 AI Storysmith. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <audio id="storyAudio" class="hidden"></audio>
+
+    <script>
+        // API Configuration
+        const apiKey = "AIzaSyA6Epk2AsT7GoB7XeuzyivCkAtkJD13hzQ";
+        const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        const audioApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+
+        // DOM elements
+        const keywordsInput = document.getElementById('keywords');
+        const generatePromptBtn = document.getElementById('generatePromptBtn');
+        const generateCharacterBtn = document.getElementById('generateCharacterBtn');
+        const generateStoryBtn = document.getElementById('generateStoryBtn');
+        const continueStoryBtn = document.getElementById('continueStoryBtn');
+        const summarizeStoryBtn = document.getElementById('summarizeStoryBtn');
+        const suggestIdeasBtn = document.getElementById('suggestIdeasBtn');
+        const categoryButtons = document.querySelectorAll('.category-button');
+        const categoryLoadingOverlay = document.getElementById('categoryLoadingOverlay');
+        
+        const audioIconContainer = document.getElementById('audioIconContainer');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const storyAudio = document.getElementById('storyAudio');
+
+        const promptOutput = document.getElementById('promptOutput');
+        const characterOutput = document.getElementById('characterOutput');
+        const storyOutput = document.getElementById('storyOutput');
+        const summaryOutput = document.getElementById('summaryOutput');
+        const suggestionOutput = document.getElementById('suggestionOutput');
+        const promptPlaceholderEl = document.getElementById('promptPlaceholder');
+        const characterPlaceholderEl = document.getElementById('characterPlaceholder');
+        const storyPlaceholderEl = document.getElementById('storyPlaceholder');
+        const summaryPlaceholderEl = document.getElementById('summaryPlaceholder');
+        const storyLoadingMessage = document.getElementById('storyLoadingMessage');
+
+        // Global state for audio timing and current category
+        let audioTimingInfo = [];
+        let currentLineIndex = -1;
+        let isAudioReady = false;
+        let currentCategory = 'general';
+
+        // Placeholder texts and button labels based on category
+        const categories = {
+            general: {
+                placeholder: "e.g., 'a magical lake, a small deer'",
+                storyBtnText: 'Write Story',
+                promptPlaceholder: "Your story prompt will appear here...",
+                characterPlaceholder: "Your character details will appear here...",
+                storyPlaceholder: "Your complete story will appear here...",
+                summaryPlaceholder: "Your story summary will appear here..."
+            },
+            childrensStories: {
+                placeholder: "e.g., 'a magical lake, a small deer, in Urdu'",
+                storyBtnText: "Write Children's Story",
+                promptPlaceholder: "Your children's story prompt will appear here...",
+                characterPlaceholder: "Your character details for a children's story will appear here...",
+                storyPlaceholder: "Your complete children's story will appear here...",
+                summaryPlaceholder: "Your children's story summary will appear here..."
+            },
+            poems: {
+                placeholder: "e.g., 'night, stars, silence'",
+                storyBtnText: 'Write Poem',
+                promptPlaceholder: "Your poem prompt will appear here...",
+                characterPlaceholder: "Your character details for a poem will appear here...",
+                storyPlaceholder: "Your complete poem will appear here...",
+                summaryPlaceholder: "Your poem summary will appear here..."
+            },
+            riddles: {
+                placeholder: "e.g., 'I have eyes, but cannot see'",
+                storyBtnText: 'Write Riddle',
+                promptPlaceholder: "Your riddle prompt will appear here...",
+                characterPlaceholder: "Your character details for a riddle will appear here...",
+                storyPlaceholder: "Your complete riddle will appear here...",
+                summaryPlaceholder: "Your riddle summary will appear here..."
+            },
+            jokes: {
+                placeholder: "e.g., 'a man and a bear'",
+                storyBtnText: 'Write Joke',
+                promptPlaceholder: "Your joke prompt will appear here...",
+                characterPlaceholder: "Your character details for a joke will appear here...",
+                storyPlaceholder: "Your complete joke will appear here...",
+                summaryPlaceholder: "Your joke summary will appear here..."
+            },
+            poetry: {
+                placeholder: "e.g., 'love, loneliness, rain'",
+                storyBtnText: 'Write Poetry',
+                promptPlaceholder: "Your poetry prompt will appear here...",
+                characterPlaceholder: "Your character details for a poetry will appear here...",
+                storyPlaceholder: "Your complete poetry will appear here...",
+                summaryPlaceholder: "Your poetry summary will appear here..."
+            }
+        };
+
+        // Simple exponential backoff for retrying failed API calls
+        async function fetchWithExponentialBackoff(url, options, maxRetries = 5, delay = 1000) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response;
+                } catch (error) {
+                    if (i < maxRetries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+        }
+        
+        // --- PCM to WAV conversion helpers ---
+        function base64ToArrayBuffer(base64) {
+            const binaryString = window.atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        function pcmToWav(pcm16, sampleRate) {
+            const wavData = new Uint8Array(44 + pcm16.byteLength);
+            const view = new DataView(wavData.buffer);
+
+            // RIFF chunk
+            view.setUint32(0, 0x52494646, true); // "RIFF"
+            view.setUint32(4, 36 + pcm16.byteLength, true); // file size
+            view.setUint32(8, 0x57415645, true); // "WAVE"
+
+            // fmt chunk
+            view.setUint32(12, 0x666d7420, true); // "fmt "
+            view.setUint32(16, 16, true); // chunk size
+            view.setUint16(20, 1, true); // audio format (1 = PCM)
+            view.setUint16(22, 1, true); // num channels
+            view.setUint32(24, sampleRate, true); // sample rate
+            view.setUint32(28, sampleRate * 2, true); // byte rate
+            view.setUint16(32, 2, true); // block align
+            view.setUint16(34, 16, true); // bits per sample
+
+            // data chunk
+            view.setUint32(36, 0x64617461, true); // "data"
+            view.setUint32(40, pcm16.byteLength, true); // data size
+
+            const pcm16Bytes = new Uint8Array(pcm16.buffer);
+            wavData.set(pcm16Bytes, 44);
+
+            return new Blob([wavData], { type: 'audio/wav' });
+        }
+
+        // --- Core logic functions ---
+
+        // Function to detect language from keywords
+        function getLanguage(keywords) {
+            const lowerKeywords = keywords.toLowerCase();
+            if (lowerKeywords.includes('urdu') || lowerKeywords.includes('اردو') || lowerKeywords.includes('mein')) {
+                return 'ur';
+            }
+            if (lowerKeywords.includes('hindi') || lowerKeywords.includes('हिन्दी') || lowerKeywords.includes('me')) {
+                return 'hi';
+            }
+            if (lowerKeywords.includes('spanish') || lowerKeywords.includes('español')) {
+                return 'es';
+            }
+            if (lowerKeywords.includes('french') || lowerKeywords.includes('français')) {
+                return 'fr';
+            }
+            if (lowerKeywords.includes('german') || lowerKeywords.includes('deutsch')) {
+                return 'de';
+            }
+            return 'en';
+        }
+
+        // Dynamic prompts that can handle any language
+        const prompts = {
+            general: {
+                prompt: (keywords) => `Based on the following keywords, create a single, creative, and concise story prompt. Do not include any extra text. Just the prompt itself. Keywords: ${keywords}`,
+                character: (keywords) => `Based on these keywords, create a complete character profile. Include their name, personality traits, physical appearance, and background story. The response should be in the same language as the prompt. Keywords: ${keywords}`,
+                story: (keywords) => `Based on the following keywords, write a detailed and engaging short story of at least 1000 words. The story should have a clear beginning, middle, and end. Use paragraphs to format the story. Keywords: ${keywords}`,
+                storyInstruction: "You are a master storyteller. Your task is to write a complete story from a given prompt. The story should be in the language specified in the prompt.",
+                ideas: () => "Suggest 5 creative themes or ideas for a story. Be concise and format the response as a numbered list with no extra text."
+            },
+            childrensStories: {
+                prompt: (keywords) => `Based on the following keywords, create a single, creative, and concise children's story prompt. The story should be simple, positive, and have a clear moral lesson. Do not include any extra text. Just the prompt itself. Keywords: ${keywords}`,
+                character: (keywords) => `Based on these keywords, create a simple and friendly character profile for a children's story. Include their name, a few personality traits, and a brief description. The response should be in the same language as the prompt. Keywords: ${keywords}`,
+                story: (keywords) => `Based on the following keywords, write a detailed and engaging short story for children. The story should be simple, positive, have a clear beginning, middle, and end, and a moral lesson. Use paragraphs to format the story. Keywords: ${keywords}`,
+                storyInstruction: "You are a storyteller for children. Write a positive and engaging children's story that has a clear moral lesson at the end. The story should be in the language specified.",
+                ideas: () => "Suggest 5 creative themes or ideas for a children's story. Be concise and format the response as a numbered list with no extra text."
+            },
+            poems: {
+                prompt: (keywords) => `Based on the following keywords, create a single, creative and concise poem prompt. Do not include any extra text. Just the prompt itself. Keywords: ${keywords}`,
+                character: (keywords) => `Based on these keywords, create a simple and friendly character profile for a poem. Include their name, a few personality traits, and a brief description. The response should be in the same language as the prompt. Keywords: ${keywords}`,
+                story: (keywords) => `Based on the following keywords, write a detailed and engaging short poem. The poem should have a clear beginning, middle, and end, and a moral lesson. Use paragraphs to format the poem. Keywords: ${keywords}`,
+                storyInstruction: "You are a master poet. Write a beautiful and emotionally resonant poem from the given keywords. The poem must be in the language specified.",
+                ideas: () => "Suggest 5 creative themes or ideas for a poem. Be concise and format the response as a numbered list with no extra text."
+            },
+            riddles: {
+                placeholder: "e.g., 'I have eyes, but cannot see'",
+                storyBtnText: 'Write Riddle',
+                promptPlaceholder: "Your riddle prompt will appear here...",
+                characterPlaceholder: "Your character details for a riddle will appear here...",
+                storyPlaceholder: "Your complete riddle will appear here...",
+                summaryPlaceholder: "Your riddle summary will appear here...",
+                prompt: (keywords) => `Based on the following keywords, create a single, creative and concise riddle prompt. Do not include any extra text. Just the prompt itself. Keywords: ${keywords}`,
+                character: (keywords) => `Based on these keywords, create a simple and friendly character profile for a riddle. Include their name, a few personality traits, and a brief description. The response should be in the same language as the prompt. Keywords: ${keywords}`,
+                story: (keywords) => `Based on the following keywords, write a single, short and creative riddle. Do not include the answer in the riddle itself. Keywords: ${keywords}`,
+                storyInstruction: "You are an expert at writing riddles. Create a short and clever riddle based on the user's keywords. Do not include the answer. The riddle must be in the language specified.",
+                ideas: () => "Suggest 5 creative themes or ideas for a riddle. Be concise and format the response as a numbered list with no extra text."
+            },
+            jokes: {
+                placeholder: "e.g., 'a man and a bear'",
+                storyBtnText: 'Write Joke',
+                promptPlaceholder: "Your joke prompt will appear here...",
+                characterPlaceholder: "Your character details for a joke will appear here...",
+                storyPlaceholder: "Your complete joke will appear here...",
+                summaryPlaceholder: "Your joke summary will appear here...",
+                prompt: (keywords) => `Based on the following keywords, create a single, creative and concise joke prompt. Do not include any extra text. Just the prompt itself. Keywords: ${keywords}`,
+                character: (keywords) => `Based on these keywords, create a simple and friendly character profile for a joke. Include their name, a few personality traits, and a brief description. The response should be in the same language as the prompt. Keywords: ${keywords}`,
+                story: (keywords) => `Based on the following keywords, write a short, clean, and funny joke. The joke should have a clear setup and punchline. Keywords: ${keywords}`,
+                storyInstruction: "You are a professional comedian. Write a short, clean, and funny joke based on the user's keywords. The joke must be in the language specified.",
+                ideas: () => "Suggest 5 creative themes or ideas for a joke. Be concise and format the response as a numbered list with no extra text."
+            },
+            poetry: {
+                placeholder: "e.g., 'love, loneliness, rain'",
+                storyBtnText: 'Write Poetry',
+                promptPlaceholder: "Your poetry prompt will appear here...",
+                characterPlaceholder: "Your character details for a poetry will appear here...",
+                storyPlaceholder: "Your complete poetry will appear here...",
+                summaryPlaceholder: "Your poetry summary will appear here...",
+                prompt: (keywords) => `Based on the following keywords, create a single, creative and concise poetry prompt. Do not include any extra text. Just the prompt itself. Keywords: ${keywords}`,
+                character: (keywords) => `Based on these keywords, create a simple and friendly character profile for a poetry. Include their name, a few personality traits, and a brief description. The response should be in the same language as the prompt. Keywords: ${keywords}`,
+                story: (keywords) => `Based on the following keywords, write a detailed and engaging short poetry. The poetry should have a clear beginning, middle, and end, and a moral lesson. Use paragraphs to format the poetry. Keywords: ${keywords}`,
+                storyInstruction: "You are a master poet. Write a beautiful and emotionally resonant poetry from the given keywords. The poetry must be in the language specified.",
+                ideas: () => "Suggest 5 creative themes or ideas for a poetry. Be concise and format the response as a numbered list with no extra text."
+            }
+        };
+
+        // Event Listeners
+        generatePromptBtn.addEventListener('click', handleGeneratePrompt);
+        generateCharacterBtn.addEventListener('click', handleGenerateCharacter);
+        generateStoryBtn.addEventListener('click', handleGenerateStory);
+        continueStoryBtn.addEventListener('click', handleContinueStory);
+        summarizeStoryBtn.addEventListener('click', handleSummarizeStory);
+        suggestIdeasBtn.addEventListener('click', handleSuggestIdeas);
+        storyAudio.addEventListener('timeupdate', handleAudioTimeUpdate);
+        storyAudio.addEventListener('ended', handleAudioEnded);
+
+        // Add event listeners for category buttons
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', handleCategorySelection);
+        });
+        
+        // Initial setup for the default category
+        window.addEventListener('load', () => {
+            handleCategorySelection({ target: document.getElementById('generalBtn') });
+        });
+
+        function handleCategorySelection(event) {
+            // First, show the loading overlay
+            categoryLoadingOverlay.classList.remove('hidden');
+
+            setTimeout(() => {
+                // Remove active class from all buttons
+                categoryButtons.forEach(btn => btn.classList.remove('active'));
+
+                // Add active class to the clicked button
+                event.target.classList.add('active');
+
+                // Update the current category and placeholder
+                const category = event.target.dataset.category;
+                currentCategory = category;
+                keywordsInput.placeholder = categories[category].placeholder;
+                generateStoryBtn.textContent = categories[category].storyBtnText;
+
+                // Update all placeholders based on the selected category
+                promptPlaceholderEl.textContent = categories[category].promptPlaceholder;
+                characterPlaceholderEl.textContent = categories[category].characterPlaceholder;
+                storyPlaceholderEl.textContent = categories[category].storyPlaceholder;
+                summaryPlaceholderEl.textContent = categories[category].summaryPlaceholder;
+                
+                // Clear previous outputs
+                promptOutput.innerHTML = `<p id="promptPlaceholder" class="text-gray-400 italic">${categories[category].promptPlaceholder}</p>`;
+                characterOutput.innerHTML = `<p id="characterPlaceholder" class="text-gray-400 italic">${categories[category].characterPlaceholder}</p>`;
+                storyOutput.innerHTML = `<p id="storyPlaceholder" class="text-gray-400 italic">${categories[category].storyPlaceholder}</p>`;
+                summaryOutput.innerHTML = `<p id="summaryPlaceholder" class="text-gray-400 italic">${categories[category].summaryPlaceholder}</p>`;
+                suggestionOutput.innerHTML = '';
+                suggestionOutput.classList.add('hidden');
+                
+                // Reset button states
+                generateStoryBtn.disabled = true;
+                continueStoryBtn.disabled = true;
+                summarizeStoryBtn.disabled = true;
+                
+                // Hide character and summary outputs
+                characterOutput.classList.add('hidden');
+                summaryOutput.classList.add('hidden');
+
+                // Finally, hide the loading overlay
+                categoryLoadingOverlay.classList.add('hidden');
+            }, 1000); // Wait for 1 second
+        }
+
+        async function handleSuggestIdeas() {
+            const originalBtnText = suggestIdeasBtn.textContent;
+            suggestIdeasBtn.textContent = 'Generating...';
+            suggestIdeasBtn.disabled = true;
+            
+            suggestionOutput.classList.remove('hidden');
+            suggestionOutput.innerHTML = `<p class="text-gray-400 italic animate-pulse">Generating ideas...</p>`;
+            
+            const userPrompt = prompts[currentCategory]?.ideas() || prompts.general.ideas();
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: {
+                    parts: [{ text: "You are a creative idea generator. Your task is to provide a list of ideas based on the user's prompt. Do not add any extra text or conversational phrases. Only provide the list." }]
+                }
+            };
+            
+            try {
+                const response = await fetchWithExponentialBackoff(textApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (generatedText) {
+                    const ideas = generatedText.split('\n').filter(line => line.trim() !== '');
+                    suggestionOutput.innerHTML = `<p class="text-gray-300 font-semibold mb-2">Here are some ideas:</p>`;
+                    const ideasList = document.createElement('ul');
+                    ideasList.classList.add('list-disc', 'list-inside', 'space-y-2');
+                    ideas.forEach((idea, index) => {
+                        const li = document.createElement('li');
+                        li.textContent = idea.replace(/^\d+\.\s*/, '');
+                        li.classList.add('text-gray-300', 'suggestion-item');
+                        li.style.animationDelay = `${index * 0.1}s`;
+                        ideasList.appendChild(li);
+                    });
+                    suggestionOutput.appendChild(ideasList);
+                } else {
+                    suggestionOutput.innerHTML = `<p class="text-red-400">Failed to generate ideas. Please try again.</p>`;
+                }
+
+            } catch (error) {
+                console.error('Error generating ideas:', error);
+                suggestionOutput.innerHTML = `<p class="text-red-400">An error occurred. Please try again.</p>`;
+            } finally {
+                suggestIdeasBtn.textContent = originalBtnText;
+                suggestIdeasBtn.disabled = false;
+            }
+        }
+
+        async function handleGeneratePrompt() {
+            const keywords = keywordsInput.value.trim();
+            if (!keywords) {
+                promptOutput.innerHTML = `<p class="text-red-400">Please enter some keywords or topics first.</p>`;
+                return;
+            }
+
+            const originalPromptBtnText = generatePromptBtn.textContent;
+            generatePromptBtn.textContent = 'Generating...';
+            generatePromptBtn.disabled = true;
+            generateStoryBtn.disabled = true;
+            continueStoryBtn.disabled = true;
+            promptOutput.innerHTML = `<p class="text-gray-400 italic animate-pulse">Generating...</p>`;
+            storyOutput.innerHTML = `<p id="storyPlaceholder" class="text-gray-400 italic">${storyPlaceholderEl.textContent}</p>`;
+            characterOutput.innerHTML = `<p class="text-gray-400 italic">${characterPlaceholderEl.textContent}</p>`;
+            summaryOutput.innerHTML = `<p class="text-gray-400 italic">${summaryPlaceholderEl.textContent}</p>`;
+            characterOutput.classList.add('hidden');
+            summaryOutput.classList.add('hidden');
+            audioIconContainer.classList.add('hidden');
+            
+            const userPrompt = prompts[currentCategory]?.prompt(keywords) || prompts.general.prompt(keywords);
+            const language = getLanguage(keywords);
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: {
+                    parts: [{ text: "You are a creative writing assistant that generates great story prompts. The prompt should be in the language of the user." }]
+                }
+            };
+
+            try {
+                const response = await fetchWithExponentialBackoff(textApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (generatedText) {
+                    promptOutput.innerHTML = `<p class="output-text font-bold text-gray-200">${generatedText}</p>`;
+                    promptOutput.classList.add('fade-in');
+                    generateStoryBtn.disabled = false;
+                } else {
+                    promptOutput.innerHTML = `<p class="text-red-400">Failed to generate prompt. Please try again.</p>`;
+                }
+
+            } catch (error) {
+                console.error('Error generating prompt:', error);
+                promptOutput.innerHTML = `<p class="text-red-400">An error occurred. Please try again.</p>`;
+            } finally {
+                generatePromptBtn.textContent = originalPromptBtnText;
+                generatePromptBtn.disabled = false;
+                generateCharacterBtn.disabled = false;
+                summarizeStoryBtn.disabled = true;
+            }
+        }
+        
+        async function handleGenerateCharacter() {
+            const keywords = keywordsInput.value.trim();
+            if (!keywords) {
+                characterOutput.innerHTML = `<p class="text-red-400">Please enter some keywords or topics first.</p>`;
+                characterOutput.classList.remove('hidden');
+                return;
+            }
+
+            const originalCharacterBtnText = generateCharacterBtn.textContent;
+            generateCharacterBtn.textContent = 'Generating...';
+            generateCharacterBtn.disabled = true;
+            characterOutput.classList.remove('hidden');
+            characterOutput.innerHTML = `<p class="text-gray-400 italic animate-pulse">Generating...</p>`;
+            
+            const userPrompt = prompts[currentCategory]?.character(keywords) || prompts.general.character(keywords);
+            const language = getLanguage(keywords);
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: {
+                    parts: [{ text: "You are a creative writer who generates detailed and compelling character profiles. Respond in the language of the user." }]
+                }
+            };
+            
+            try {
+                const response = await fetchWithExponentialBackoff(textApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (generatedText) {
+                    characterOutput.innerHTML = `<p class="output-text font-bold text-gray-200">${generatedText.replace(/\n/g, '<br>')}</p>`;
+                    characterOutput.classList.add('fade-in');
+                } else {
+                    characterOutput.innerHTML = `<p class="text-red-400">Failed to generate character. Please try again.</p>`;
+                }
+
+            } catch (error) {
+                console.error('Error generating character:', error);
+                characterOutput.innerHTML = `<p class="text-red-400">An error occurred. Please try again.</p>`;
+            } finally {
+                generateCharacterBtn.textContent = originalCharacterBtnText;
+                generateCharacterBtn.disabled = false;
+            }
+        }
+
+        async function handleGenerateStory() {
+            const prompt = promptOutput.textContent.trim();
+            if (!prompt || prompt.includes(promptPlaceholderEl.textContent)) {
+                storyOutput.innerHTML = `<p class="text-red-400">Please generate a valid story prompt first.</p>`;
+                return;
+            }
+
+            const originalStoryBtnText = generateStoryBtn.textContent;
+            generateStoryBtn.textContent = 'Writing...';
+            generateStoryBtn.disabled = true;
+            generatePromptBtn.disabled = true;
+            continueStoryBtn.disabled = true;
+            
+            // Show text loading state
+            storyOutput.innerHTML = `<p class="text-gray-400 italic animate-pulse">Writing story...</p>`;
+            storyLoadingMessage.classList.remove('hidden');
+            
+            audioIconContainer.classList.add('hidden');
+            playIcon.classList.add('hidden');
+            pauseIcon.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+            isAudioReady = false;
+
+            const userPrompt = prompts[currentCategory]?.story(keywordsInput.value.trim()) || prompts.general.story(keywordsInput.value.trim());
+            const systemInstruction = prompts[currentCategory]?.storyInstruction || prompts.general.storyInstruction;
+            const language = getLanguage(keywordsInput.value.trim());
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: {
+                    parts: [{ text: systemInstruction }]
+                }
+            };
+
+            try {
+                const response = await fetchWithExponentialBackoff(textApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (generatedText) {
+                    let formattedContent = '';
+                    let paragraphs = [];
+
+                    // Formatting based on category
+                    switch(currentCategory) {
+                        case 'poems':
+                        case 'poetry':
+                            // For poems and poetry, preserve line breaks
+                            formattedContent = generatedText.replace(/\n/g, '<br>');
+                            paragraphs = generatedText.split('\n'); // Split by line for audio timing
+                            storyOutput.innerHTML = `<p class="output-text font-bold text-gray-200">${formattedContent}</p>`;
+                            break;
+                        case 'riddles':
+                        case 'jokes':
+                            // Simple formatting for short, direct text
+                            formattedContent = generatedText;
+                            paragraphs = [generatedText]; // Treat as a single block for audio timing
+                            storyOutput.innerHTML = `<p class="output-text font-bold text-gray-200">${formattedContent}</p>`;
+                            break;
+                        default:
+                            // Default to paragraph-based formatting for stories
+                            paragraphs = generatedText.split('\n\n');
+                            paragraphs.forEach((p, index) => {
+                                formattedContent += `<p id="line-${index}" class="mb-4 font-bold text-gray-200">${p}</p>`;
+                            });
+                            storyOutput.innerHTML = `<div class="output-text font-bold">${formattedContent}</div>`;
+                            break;
+                    }
+
+                    storyOutput.classList.add('fade-in');
+                    summarizeStoryBtn.disabled = false;
+                    continueStoryBtn.disabled = false;
+                    
+                    // Now, generate the audio
+                    await handleGenerateAudio(paragraphs);
+                    storyLoadingMessage.classList.add('hidden');
+
+                } else {
+                    storyOutput.innerHTML = `<p class="text-red-400">Failed to write story. Please try again.</p>`;
+                    storyLoadingMessage.classList.add('hidden');
+                }
+
+            } catch (error) {
+                console.error('Error generating story:', error);
+                storyOutput.innerHTML = `<p class="text-red-400">An error occurred. Please try again.</p>`;
+                storyLoadingMessage.classList.add('hidden');
+            } finally {
+                generateStoryBtn.textContent = originalStoryBtnText;
+                generateStoryBtn.disabled = false;
+                generatePromptBtn.disabled = false;
+            }
+        }
+        
+        async function handleContinueStory() {
+            const storyTextDiv = storyOutput.querySelector('.output-text');
+            const paragraphs = storyTextDiv.querySelectorAll('p');
+
+            if (paragraphs.length === 0) {
+                storyOutput.innerHTML = `<p class="text-red-400">No story to continue. Please write a story first.</p>`;
+                return;
+            }
+            
+            const lastParagraph = paragraphs[paragraphs.length - 1].textContent;
+            
+            const originalContinueBtnText = continueStoryBtn.textContent;
+            continueStoryBtn.textContent = 'Continuing...';
+            continueStoryBtn.disabled = true;
+
+            const userPrompt = `Continue the following story with one new paragraph. The tone and style should match the provided text. Do not add any extra text or conversational phrases. Story excerpt: ${lastParagraph}`;
+            const language = getLanguage(keywordsInput.value.trim());
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: {
+                    parts: [{ text: "You are a creative writer who continues a story. Your task is to write one new paragraph that flows seamlessly from the provided text. Do not repeat the previous paragraph or add any commentary. The response should be in the same language as the provided text." }]
+                }
+            };
+            
+            try {
+                const response = await fetchWithExponentialBackoff(textApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (generatedText) {
+                    const newParagraph = document.createElement('p');
+                    const newLineIndex = paragraphs.length;
+                    newParagraph.id = `line-${newLineIndex}`;
+                    newParagraph.classList.add('mb-4', 'font-bold', 'text-gray-200', 'fade-in');
+                    newParagraph.textContent = generatedText;
+                    storyTextDiv.appendChild(newParagraph);
+                    
+                    // Scroll to the new paragraph
+                    newParagraph.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                } else {
+                    const errorMsg = document.createElement('p');
+                    errorMsg.classList.add('text-red-400');
+                    errorMsg.textContent = 'Failed to continue story. Please try again.';
+                    storyTextDiv.appendChild(errorMsg);
+                }
+            } catch (error) {
+                console.error('Error continuing story:', error);
+                const errorMsg = document.createElement('p');
+                errorMsg.classList.add('text-red-400');
+                errorMsg.textContent = 'An error occurred. Please try again.';
+                storyTextDiv.appendChild(errorMsg);
+            } finally {
+                continueStoryBtn.textContent = originalContinueBtnText;
+                continueStoryBtn.disabled = false;
+            }
+        }
+        
+        async function handleGenerateAudio(paragraphs) {
+            const fullStoryText = paragraphs.join('\n\n');
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: fullStoryText }]
+                }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: { voiceName: "Kore" }
+                        }
+                    }
+                },
+                model: "gemini-2.5-flash-preview-tts"
+            };
+
+            try {
+                const response = await fetchWithExponentialBackoff(audioApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const part = result?.candidates?.[0]?.content?.parts?.[0];
+                const audioData = part?.inlineData?.data;
+                const mimeType = part?.inlineData?.mimeType;
+
+                audioTimingInfo = part?.speechMetadata?.timingInfo || [];
+
+                if (audioData && mimeType && mimeType.startsWith("audio/")) {
+                    const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)[1], 10);
+                    const pcmData = base64ToArrayBuffer(audioData);
+                    const pcm16 = new Int16Array(pcmData);
+                    const wavBlob = pcmToWav(pcm16, sampleRate);
+                    const audioUrl = URL.createObjectURL(wavBlob);
+                    
+                    storyAudio.src = audioUrl;
+
+                    storyAudio.addEventListener('canplaythrough', () => {
+                        isAudioReady = true;
+                        playIcon.classList.remove('hidden');
+                        loadingSpinner.classList.add('hidden');
+                        audioIconContainer.classList.remove('hidden');
+                    }, { once: true });
+
+                } else {
+                    console.error('Audio data or mime type not found in response.');
+                    loadingSpinner.classList.add('hidden');
+                    const errorMessage = "Audio generate karne mein dikkat aayi hai. Kripya phir se koshish karen.";
+                    storyOutput.innerHTML += `<p class="text-red-400 mt-4">${errorMessage}</p>`;
+                }
+            } catch (error) {
+                console.error('Audio generate karne mein error:', error);
+                loadingSpinner.classList.add('hidden');
+                const errorMessage = "Audio generate karne mein ek error aayi hai. Kripya phir se koshish karen.";
+                storyOutput.innerHTML += `<p class="text-red-400 mt-4">${errorMessage}</p>`;
+            }
+        }
+        
+        function handlePlayAudio() {
+            if (!isAudioReady) {
+                console.warn('Audio is not ready yet.');
+                return;
+            }
+
+            if (storyAudio.paused) {
+                storyAudio.play();
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+            } else {
+                storyAudio.pause();
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+            }
+        }
+
+        function handleAudioTimeUpdate() {
+            const currentTime = storyAudio.currentTime * 1000; // Convert to milliseconds
+            
+            const lines = storyOutput.querySelectorAll('p');
+            lines.forEach(line => line.classList.remove('highlighted-line'));
+
+            let foundLine = false;
+            for (let i = 0; i < audioTimingInfo.length; i++) {
+                const info = audioTimingInfo[i];
+                if (currentTime >= info.startOffsetMs && currentTime <= info.endOffsetMs) {
+                    const lineElement = storyOutput.querySelector(`p#line-${i}`);
+                    if (lineElement) {
+                        lineElement.classList.add('highlighted-line');
+                        foundLine = true;
+                    }
+                    break;
+                }
+            }
+            if (!foundLine && currentLineIndex !== -1) {
+                 storyOutput.querySelector(`#line-${currentLineIndex}`).classList.remove('highlighted-line');
+                 currentLineIndex = -1;
+            }
+        }
+        
+        function handleAudioEnded() {
+            storyOutput.querySelectorAll('p').forEach(line => line.classList.remove('highlighted-line'));
+            playIcon.classList.remove('hidden');
+            pauseIcon.classList.add('hidden');
+            currentLineIndex = -1;
+        }
+
+        async function handleSummarizeStory() {
+            const storyText = storyOutput.textContent.trim();
+            if (!storyText || storyText.includes(storyPlaceholderEl.textContent)) {
+                summaryOutput.innerHTML = `<p class="text-red-400">Please write a story first to generate a summary.</p>`;
+                summaryOutput.classList.remove('hidden');
+                return;
+            }
+
+            const originalSummaryBtnText = summarizeStoryBtn.textContent;
+            summarizeStoryBtn.textContent = 'Summarizing...';
+            summarizeStoryBtn.disabled = true;
+            summaryOutput.classList.remove('hidden');
+            summaryOutput.innerHTML = `<p class="text-gray-400 italic animate-pulse">Generating summary...</p>`;
+            
+            const userPrompt = `Create a short summary and a concise, catchy title for this story. Format the response as follows: "Title: [Your Title]\nSummary: [Your Summary]". The summary and title should be in the same language as the story provided. Story: ${storyText}`;
+            const language = getLanguage(keywordsInput.value.trim());
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: {
+                    parts: [{ text: "You are an expert editor who creates brief summaries and catchy titles for stories. The summary and title should be in the language of the provided story." }]
+                }
+            };
+            
+            try {
+                const response = await fetchWithExponentialBackoff(textApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (generatedText) {
+                    const [titlePart, summaryPart] = generatedText.split('\n');
+                    const title = titlePart ? titlePart.replace('Title: ', '').trim() : '';
+                    const summary = summaryPart ? summaryPart.replace('Summary: ', '').trim() : '';
+                    
+                    summaryOutput.innerHTML = `
+                        <p class="font-bold text-lg mb-2 text-gray-200">Title:</p>
+                        <p class="output-text text-gray-300 font-bold mb-4">${title}</p>
+                        <p class="font-bold text-lg mb-2 text-gray-200">Summary:</p>
+                        <p class="output-text text-gray-300 font-bold">${summary}</p>
+                    `;
+                    summaryOutput.classList.add('fade-in');
+                } else {
+                    summaryOutput.innerHTML = `<p class="text-red-400">Failed to generate summary. Please try again.</p>`;
+                }
+
+            } catch (error) {
+                console.error('Error summarizing story:', error);
+                summaryOutput.innerHTML = `<p class="text-red-400">An error occurred. Please try again.</p>`;
+            } finally {
+                summarizeStoryBtn.textContent = originalSummaryBtnText;
+                summarizeStoryBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
