@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,8 +19,9 @@
             color: #e2e8f0; /* Light gray text */
         }
         .container {
-            max-width: 800px;
-            padding: 2rem;
+            /* Increased max-width to make the content and newsletter wider */
+            max-width: 960px;
+            padding: 1rem;
         }
         .header-card {
             background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%); /* Darker gradient */
@@ -89,7 +90,6 @@
         .footer-link:hover {
             color: #3b82f6;
         }
-
 
         textarea {
             resize: none;
@@ -165,6 +165,7 @@
             border: 2px solid #4a5568;
             background-color: #2d3748;
             transition: all 0.2s ease-in-out;
+            white-space: nowrap; /* Prevents wrapping */
         }
         .category-button:hover:not(.active) {
             transform: scale(1.05);
@@ -220,271 +221,583 @@
             border-top-color: #60a5fa; /* Lighter spinner color */
             animation: spin 1s linear infinite;
         }
+
+        /* Styles for the modern header navigation */
+        .modern-nav {
+            background-color: #2d3748;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-in-out;
+            z-index: 50;
+        }
+
+        .header-hidden {
+            transform: translateY(-100%);
+        }
+
+        .nav-link {
+            color: #e2e8f0;
+            font-weight: 500;
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            background-color: #4a5568;
+            color: #fff;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(45deg, #3b82f6, #60a5fa);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Content page styles */
+        .page {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .page-content {
+            background-color: #2d3748;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            min-height: 400px;
+        }
+
+        .hidden {
+            display: none;
+        }
+        
+        /* New styles for the scrollable category area */
+        .category-list-container {
+            -webkit-overflow-scrolling: touch;
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .category-list-container::-webkit-scrollbar {
+            display: none;
+        }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4">
-
-    <div class="container mx-auto p-4 md:p-8 space-y-8">
-        
-        <!-- Header -->
-        <header class="header-card text-center p-8 mb-8">
-            <h1 class="text-4xl md:text-5xl font-extrabold gradient-text leading-tight mt-12">AI Storysmith</h1>
-            <p class="mt-4 text-lg text-gray-300">Your creative companion. Generate stories in any language.</p>
-            
-            <!-- Category Navigation -->
-            <nav class="mt-6">
-                <ul class="flex justify-center flex-wrap gap-4 text-gray-300 text-sm font-semibold">
-                    <li id="generalBtn" class="category-button active px-4 py-2 rounded-full hover:bg-gray-700 transition-colors cursor-pointer" data-category="general">General Stories</li>
-                    <li id="childrensStoriesBtn" class="category-button px-4 py-2 rounded-full hover:bg-gray-700 transition-colors cursor-pointer" data-category="childrensStories">Children's Stories</li>
-                    <li id="poemsBtn" class="category-button px-4 py-2 rounded-full hover:bg-gray-700 transition-colors cursor-pointer" data-category="poems">Poems</li>
-                    <li id="riddlesBtn" class="category-button px-4 py-2 rounded-full hover:bg-gray-700 transition-colors cursor-pointer" data-category="riddles">Riddles</li>
-                    <li id="jokesBtn" class="category-button px-4 py-2 rounded-full hover:bg-gray-700 transition-colors cursor-pointer" data-category="jokes">Jokes</li>
-                    <li id="poetryBtn" class="category-button px-4 py-2 rounded-full hover:bg-gray-700 transition-colors cursor-pointer" data-category="poetry">Poetry</li>
+<body class="flex flex-col items-center min-h-screen">
+    
+    <!-- Modern Navigation Header -->
+    <header class="w-full modern-nav fixed top-0 py-1">
+        <div class="container mx-auto flex flex-col md:flex-row items-center justify-between">
+            <h1 class="text-lg md:text-xl font-bold gradient-text mb-1 md:mb-0">AI Storysmith</h1>
+            <nav>
+                <ul class="flex space-x-2 md:space-x-4">
+                    <li><a href="#home-page" class="nav-link" id="nav-home">Home</a></li>
+                    <li><a href="#about-us-page" class="nav-link" id="nav-about">About Us</a></li>
+                    <li><a href="#blog-page" class="nav-link" id="nav-blog">Blog</a></li>
+                    <li><a href="#contact-us-page" class="nav-link" id="nav-contact">Contact Us</a></li>
                 </ul>
             </nav>
-        </header>
+        </div>
+    </header>
 
-        <!-- Main Content Card -->
-        <main class="card p-8 space-y-8 relative">
-            <!-- Category Loading Overlay - New and improved -->
-            <div id="categoryLoadingOverlay" class="category-loading-overlay hidden">
-                <div class="category-spinner"></div>
-            </div>
-            <section class="space-y-4">
-                <label for="keywords" class="text-lg font-semibold block text-gray-300">Enter a few keywords and the desired language (e.g., 'a magical lake, a small deer, in Urdu')</label>
-                <textarea id="keywords" rows="3" class="w-full p-4 rounded-xl bg-gray-700 border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors placeholder:text-gray-400" placeholder="e.g., 'a magical lake, a small deer'"></textarea>
-                
-                <!-- New controls for Length, Audience, Format, and Genre -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                    <div>
-                        <label for="storyLength" class="block text-sm font-medium text-gray-400 mb-1">Length</label>
-                        <select id="storyLength" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="short">Short</option>
-                            <option value="medium">Medium</option>
-                            <option value="long">Long</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="storyAudience" class="block text-sm font-medium text-gray-400 mb-1">Audience</label>
-                        <select id="storyAudience" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="general">General</option>
-                            <option value="children">Children</option>
-                            <option value="teens">Teens</option>
-                            <option value="adults">Adults</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="storyFormat" class="block text-sm font-medium text-gray-400 mb-1">Format</label>
-                        <select id="storyFormat" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="prose">Prose</option>
-                            <option value="poem">Poem</option>
-                            <option value="script">Script</option>
-                            <option value="short story">Short Story</option>
-                            <option value="flash fiction">Flash Fiction</option>
-                            <option value="novella">Novella</option>
-                            <option value="screenplay">Screenplay</option>
-                            <option value="letter">Letter</option>
-                            <option value="journal entry">Journal Entry</option>
-                            <option value="article">Article</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="storyGenre" class="block text-sm font-medium text-gray-400 mb-1">Genre</label>
-                        <select id="storyGenre" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="fantasy">Fantasy</option>
-                            <option value="sci-fi">Sci-Fi</option>
-                            <option value="mystery">Mystery</option>
-                            <option value="romance">Romance</option>
-                            <option value="horror">Horror</option>
-                            <option value="comedy">Comedy</option>
-                            <option value="thriller">Thriller</option>
-                            <option value="historical fiction">Historical Fiction</option>
-                            <option value="dystopian">Dystopian</option>
-                            <option value="adventure">Adventure</option>
-                            <option value="young adult">Young Adult</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <button id="suggestIdeasBtn" class="w-full button-gradient btn-suggest mt-4">
-                    ✨Suggest Ideas✨
-                </button>
-            </section>
-            
-            <section id="suggestionOutput" class="space-y-4 hidden">
-                <!-- Suggestions will be added here -->
-            </section>
-
-            <section class="space-y-4">
-                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                    <button id="generatePromptBtn" class="flex-1 w-full sm:w-auto button-gradient btn-prompt">
-                        Generate Prompt
-                    </button>
-                    <button id="generateStoryBtn" class="flex-1 w-full sm:w-auto button-gradient btn-story">
-                        Write Story
-                    </button>
-                </div>
-            </section>
-
-            <section id="outputSection" class="space-y-8 mt-8">
-                <div id="promptOutput" class="min-h-[100px] p-6 rounded-xl bg-gray-700 border border-gray-600 shadow-inner">
-                    <p id="promptPlaceholder" class="text-gray-400 italic">Your story prompt will appear here...</p>
-                </div>
-                
-                <!-- Story Output with a dedicated loading message area -->
-                <div id="storyOutput" class="relative min-h-[200px] p-6 rounded-xl bg-gray-700 border border-gray-600 shadow-inner">
-                    <p id="storyPlaceholder" class="text-gray-400 italic">Your complete story will appear here...</p>
-                    <div id="storyLoadingMessage" class="absolute inset-0 flex items-center justify-center p-4 bg-gray-700 bg-opacity-80 rounded-xl hidden">
-                        <div class="text-center text-gray-300">
-                            <svg class="loading-spinner mx-auto mb-2 w-8 h-8 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- The audio icon container is now a sibling to the story output -->
-                <div id="audioIconContainer" class="audio-icon-container hidden" onclick="handlePlayAudio()">
-                    <!-- Play Icon -->
-                    <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 hidden">
-                        <path fill-rule="evenodd" d="M11.66 2.016a.75.75 0 0 1 .75 0l9.366 5.378a.75.75 0 0 1 0 1.284l-9.366 5.378a.75.75 0 0 1-.75 0L2.308 8.678a.75.75 0 0 1 0-1.284L11.66 2.016Z" clip-rule="evenodd" />
-                        <path d="M11.99 19.34a.75.75 0 0 1 .75 0l9.366 5.378a.75.75 0 0 1 0 1.284l-9.366 5.378a.75.75 0 0 1-.75 0L2.64 25.996a.75.75 0 0 1 0-1.284L11.99 19.34Z" />
-                    </svg>
-                    <!-- Pause Icon (hidden initially) -->
-                    <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 hidden">
-                        <path fill-rule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75V5.25Zm7.5 0A.75.75 0 0 1 15 4.5h1.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H15a.75.75 0 0 1-.75-.75V5.25Z" clip-rule="evenodd" />
-                    </svg>
-                    <!-- Loading Spinner (hidden initially) -->
-                    <svg id="loadingSpinner" class="loading-spinner w-6 h-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
+    <!-- Main Content Pages -->
+    <div class="container mx-auto mt-16 md:mt-20 p-4 md:p-8 space-y-8">
         
-        <!-- Footer -->
-    
-        <footer class="text-center text-gray-500 mt-8">
-            <div class="flex justify-center space-x-6 mb-4">
-                <a href="#" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        <!-- Home Page Content (Existing Content) -->
+        <div id="home-page" class="page">
+            <header class="header-card text-center p-8 mb-8">
+                <p class="mt-4 text-lg text-gray-300">Your creative companion. Generate stories in any language.</p>
+                
+                <!-- Category Navigation -->
+                <nav class="mt-12">
+                    <div class="category-list-container">
+                        <ul class="flex justify-start sm:justify-center flex-nowrap space-x-4 px-2 pb-2 text-gray-300 text-sm font-semibold">
+                            <li id="generalBtn" class="category-button active px-4 py-2 rounded-full transition-colors cursor-pointer" data-category="general">General Stories</li>
+                            <li id="childrensStoriesBtn" class="category-button px-4 py-2 rounded-full transition-colors cursor-pointer" data-category="childrensStories">Children's Stories</li>
+                            <li id="poemsBtn" class="category-button px-4 py-2 rounded-full transition-colors cursor-pointer" data-category="poems">Poems</li>
+                            <li id="riddlesBtn" class="category-button px-4 py-2 rounded-full transition-colors cursor-pointer" data-category="riddles">Riddles</li>
+                            <li id="jokesBtn" class="category-button px-4 py-2 rounded-full transition-colors cursor-pointer" data-category="jokes">Jokes</li>
+                            <li id="poetryBtn" class="category-button px-4 py-2 rounded-full transition-colors cursor-pointer" data-category="poetry">Poetry</li>
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+
+            <!-- Main Content Card -->
+            <main class="card p-8 space-y-8 relative">
+                <!-- Category Loading Overlay - New and improved -->
+                <div id="categoryLoadingOverlay" class="category-loading-overlay hidden">
+                    <div class="category-spinner"></div>
+                </div>
+                <section class="space-y-4">
+                    <label for="keywords" class="block text-lg font-semibold text-gray-300">Enter your keywords and language (e.g., 'a magical lake, a small deer, in Urdu')</label>
+                    <textarea id="keywords" rows="3" class="w-full p-4 rounded-xl bg-gray-700 border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors placeholder:text-gray-400" placeholder="e.g., 'a magical lake, a small deer'"></textarea>
+                    
+                    <!-- New controls for Length, Audience, Format, and Genre -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                        <div>
+                            <label for="storyLength" class="block text-sm font-medium text-gray-400 mb-1">Length</label>
+                            <select id="storyLength" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="short">Short</option>
+                                <option value="medium">Medium</option>
+                                <option value="long">Long</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="storyAudience" class="block text-sm font-medium text-gray-400 mb-1">Audience</label>
+                            <select id="storyAudience" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="general">General</option>
+                                <option value="children">Children</option>
+                                <option value="teens">Teens</option>
+                                <option value="adults">Adults</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="storyFormat" class="block text-sm font-medium text-gray-400 mb-1">Format</label>
+                            <select id="storyFormat" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="prose">Prose</option>
+                                <option value="poem">Poem</option>
+                                <option value="script">Script</option>
+                                <option value="short story">Short Story</option>
+                                <option value="flash fiction">Flash Fiction</option>
+                                <option value="novella">Novella</option>
+                                <option value="screenplay">Screenplay</option>
+                                <option value="letter">Letter</option>
+                                <option value="journal entry">Journal Entry</option>
+                                <option value="article">Article</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="storyGenre" class="block text-sm font-medium text-gray-400 mb-1">Genre</label>
+                            <select id="storyGenre" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="fantasy">Fantasy</option>
+                                <option value="sci-fi">Sci-Fi</option>
+                                <option value="mystery">Mystery</option>
+                                <option value="romance">Romance</option>
+                                <option value="horror">Horror</option>
+                                <option value="comedy">Comedy</option>
+                                <option value="thriller">Thriller</option>
+                                <option value="historical fiction">Historical Fiction</option>
+                                <option value="dystopian">Dystopian</option>
+                                <option value="adventure">Adventure</option>
+                                <option value="young adult">Young Adult</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="suggestIdeasBtn" class="w-full button-gradient btn-suggest mt-4">
+                        ✨Suggest Ideas✨
+                    </button>
+                </section>
+                
+                <section id="suggestionOutput" class="space-y-4 hidden">
+                    <!-- Suggestions will be added here -->
+                </section>
+
+                <section class="space-y-4">
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button id="generatePromptBtn" class="flex-1 w-full sm:w-auto button-gradient btn-prompt">
+                            Generate Prompt
+                        </button>
+                        <button id="generateStoryBtn" class="flex-1 w-full sm:w-auto button-gradient btn-story">
+                            Write Story
+                        </button>
+                    </div>
+                </section>
+
+                <section id="outputSection" class="space-y-8 mt-8">
+                    <div id="promptOutput" class="min-h-[100px] p-6 rounded-xl bg-gray-700 border border-gray-600 shadow-inner">
+                        <p id="promptPlaceholder" class="text-gray-400 italic">Your story prompt will appear here...</p>
+                    </div>
+                    
+                    <!-- Story Output with a dedicated loading message area -->
+                    <div id="storyOutput" class="relative min-h-[200px] p-6 rounded-xl bg-gray-700 border border-gray-600 shadow-inner">
+                        <p id="storyPlaceholder" class="text-gray-400 italic">Your complete story will appear here...</p>
+                        <div id="storyLoadingMessage" class="absolute inset-0 flex items-center justify-center p-4 bg-gray-700 bg-opacity-80 rounded-xl hidden">
+                            <div class="text-center text-gray-300">
+                                <svg class="loading-spinner mx-auto mb-2 w-8 h-8 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- The audio icon container is now a sibling to the story output -->
+                    <div id="audioIconContainer" class="audio-icon-container hidden" onclick="handlePlayAudio()">
+                        <!-- Play Icon -->
+                        <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path fill-rule="evenodd" d="M11.66 2.016a.75.75 0 0 1 .75 0l9.366 5.378a.75.75 0 0 1 0 1.284l-9.366 5.378a.75.75 0 0 1-.75 0L2.308 8.678a.75.75 0 0 1 0-1.284L11.66 2.016Z" clip-rule="evenodd" />
+                            <path d="M11.99 19.34a.75.75 0 0 1 .75 0l9.366 5.378a.75.75 0 0 1 0 1.284l-9.366 5.378a.75.75 0 0 1-.75 0L2.64 25.996a.75.75 0 0 1 0-1.284L11.99 19.34Z" />
+                        </svg>
+                        <!-- Pause Icon (hidden initially) -->
+                        <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 hidden">
+                            <path fill-rule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75V5.25Zm7.5 0A.75.75 0 0 1 15 4.5h1.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H15a.75.75 0 0 1-.75-.75V5.25Z" clip-rule="evenodd" />
+                        </svg>
+                        <!-- Loading Spinner (hidden initially) -->
+                        <svg id="loadingSpinner" class="loading-spinner w-6 h-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- About Us Page -->
+        <div id="about-us-page" class="page hidden">
+            <div class="page-content">
+                <h2 class="text-3xl font-bold gradient-text mb-4">About AI Storysmith</h2>
+                <p class="text-gray-300 mb-4">AI Storysmith is more than just a tool; it’s a creative companion designed to help you unlock your imagination. We believe that everyone has a story to tell, and our mission is to make the process of bringing those ideas to life as effortless and inspiring as possible. Our platform empowers writers of all levels—from seasoned authors seeking a fresh perspective to first-time storytellers taking their initial steps—by providing a seamless bridge between a simple idea and a completed narrative.</p>
+
+                <h2 class="text-3xl font-bold gradient-text mb-4 mt-8">Our Mission</h2>
+                <p class="text-gray-300 mb-4">Our primary mission is to break down the barriers to creative expression. We understand that writer's block, a blank page, or a lack of inspiration can be daunting. By leveraging cutting-edge AI technology, we provide an intuitive space where you can generate prompts, explore new genres, and craft compelling stories in any language. We are committed to fostering a vibrant community where creativity knows no bounds.</p>
+
+                <h2 class="text-3xl font-bold gradient-text mb-4 mt-8">The Technology Behind the Magic</h2>
+                <p class="text-gray-300 mb-4">Our AI models are built on a foundation of extensive literary and narrative data, allowing them to understand context, tone, and structure. This advanced technology enables us to transform your keywords and ideas into coherent and engaging stories. Our system is continuously learning, ensuring that it remains a powerful and versatile resource for all your creative endeavors.</p>
+
+                <h2 class="text-3xl font-bold gradient-text mb-4 mt-8">Who We Are</h2>
+                <p class="text-gray-300 mb-4">We are a passionate team of developers, writers, and innovators dedicated to the art of storytelling. Our shared goal is to build a platform that not only simplifies the writing process but also ignites a love for creation. We are constantly listening to our users and evolving the platform to meet the needs of the modern storyteller.</p>
+
+                <h2 class="text-3xl font-bold gradient-text mb-4 mt-8">Join the Journey</h2>
+                <p class="text-gray-300">We invite you to start your creative journey with us. Whether you're looking to pen a short story, craft a poem, or simply find a spark of inspiration, AI Storysmith is here to help you turn your ideas into reality. Thank you for being a part of our story.</p>
             </div>
-            <div class="flex justify-center space-x-4 mb-2">
-                 <a href="#" class="footer-link">About Us</a>
-                <span class="text-gray-600">|</span>
-                <a href="#" class="footer-link">Blog</a>
-                <span class="text-gray-600">|</span>
-                <a href="#" class="footer-link">Contact Us</a>
+        </div>
+
+        <!-- Blog Page -->
+        <div id="blog-page" class="page hidden">
+            <div class="page-content">
+                <h2 class="text-3xl font-bold gradient-text mb-4">Our Blog</h2>
+                <div class="space-y-8">
+                    <article class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-200 mb-2">Tips for Using AI to Spark Creativity</h3>
+                        <p class="text-gray-400 text-sm mb-4">Published on September 15, 2025</p>
+                        <p class="text-gray-300">Discover how to use AI tools like AI Storysmith to brainstorm new ideas, develop characters, and structure your plots. We share our top five tips to help you get the most out of your creative companion.</p>
+                    </article>
+                    <article class="card p-6">
+                        <h3 class="text-xl font-bold text-gray-200 mb-2">The Future of AI in Storytelling</h3>
+                        <p class="text-gray-400 text-sm mb-4">Published on September 10, 2025</p>
+                        <p class="text-gray-300">Explore the exciting future of AI in the literary world. From collaborative writing to creating entirely new genres, we discuss the ethical considerations and creative opportunities that lie ahead.</p>
+                    </article>
+                </div>
             </div>
-            <p>Developed By: Saim Tahir</p><p>&copy; 2025 AI Storysmith. All rights reserved.</p>
-        </footer>
+        </div>
+
+        <!-- Contact Us Page -->
+        <div id="contact-us-page" class="page hidden">
+            <div class="page-content">
+                <h2 class="text-3xl font-bold gradient-text mb-4">Get in Touch</h2>
+                <p class="text-gray-300 mb-6" id="contact-message-status">We'd love to hear from you! Whether you have feedback, a question, or a feature request, please fill out the form below and we'll get back to you as soon as possible.</p>
+                <!-- 
+                    IMPORTANT: To make this form work, you must replace the placeholder URL
+                    below with your unique Formspree endpoint. See the instructions above!
+                -->
+                <!-- modify this form HTML and place wherever you want your form -->
+                <form id="contactForm"
+                  action="https://formspree.io/f/xnnbyywz"
+                  method="POST"
+                >
+                  <label>
+                    Your email:
+                    <input type="email" name="email" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  </label>
+                  <label class="block mt-4">
+                    Your message:
+                    <textarea name="message" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                  </label>
+                  <!-- your other form fields go here -->
+                  <button type="submit" class="w-full button-gradient btn-prompt mt-4">Send</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Privacy Policy Page -->
+        <div id="privacy-policy-page" class="page hidden">
+            <div class="page-content">
+                <h2 class="text-3xl font-bold gradient-text mb-4">Privacy Policy</h2>
+                <p class="text-gray-300 mb-4">Your privacy is important to us. This policy outlines how we collect, use, and protect your information when you use AI Storysmith. We are committed to ensuring the security of your data.</p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Information We Collect</h3>
+                <p class="text-gray-300 mb-4">We collect information that you voluntarily provide when you use our services, such as the keywords and language you enter to generate stories. This data is used solely to provide and improve our services to you. We do not sell or share your personal information with third parties.</p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">How We Use Your Information</h3>
+                <p class="text-gray-300 mb-4">The information you provide is used to:
+                <ul class="list-disc list-inside text-gray-300 ml-4">
+                    <li>Generate creative content based on your requests.</li>
+                    <li>Improve the performance and accuracy of our AI models.</li>
+                    <li>Provide customer support and respond to your inquiries.</li>
+                </ul>
+                </p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Data Security</h3>
+                <p class="text-gray-300 mb-4">We implement a variety of security measures to maintain the safety of your personal information. All data transmissions are encrypted. We also use secure storage to protect your data from unauthorized access.</p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Changes to This Policy</h3>
+                <p class="text-gray-300 mb-4">We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page. You are advised to review this policy periodically for any changes.</p>
+            </div>
+        </div>
+
+        <!-- Terms of Service Page -->
+        <div id="terms-of-service-page" class="page hidden">
+            <div class="page-content">
+                <h2 class="text-3xl font-bold gradient-text mb-4">Terms of Service</h2>
+                <p class="text-gray-300 mb-4">Welcome to AI Storysmith! By accessing or using our service, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, you may not use our services.</p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Use of Service</h3>
+                <p class="text-gray-300 mb-4">You agree to use AI Storysmith for lawful purposes only and in a way that does not infringe upon the rights of others. You are responsible for all content you input into the service. You may not use the service to generate content that is illegal, defamatory, or harmful.</p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Intellectual Property</h3>
+                <p class="text-gray-300 mb-4">All intellectual property rights in the service and its original content belong to AI Storysmith. The stories and prompts generated are based on your input, and you retain rights to the content you create. However, we reserve the right to use generated content for training and improving our AI models in an anonymized manner.</p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Limitation of Liability</h3>
+                <p class="text-gray-300 mb-4">AI Storysmith is provided on an "as is" and "as available" basis. We do not warrant that the service will be uninterrupted, error-free, or secure. We are not liable for any damages that may arise from your use of the service.</p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Governing Law</h3>
+                <p class="text-gray-300 mb-4">These Terms shall be governed by and construed in accordance with the laws of the jurisdiction where AI Storysmith is headquartered, without regard to its conflict of law provisions.</p>
+            </div>
+        </div>
+
     </div>
     
-    <audio id="storyAudio" class="hidden"></audio>
+    <!-- Footer -->
+    <footer class="w-full text-center text-gray-500 mt-8 mb-4">
+        <div class="flex justify-center space-x-6 mb-4">
+            <a href="#" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+        <div class="flex flex-wrap justify-center space-x-4 mb-2">
+            <a href="#privacy-policy-page" class="footer-link">Privacy Policy</a>
+            <a href="#terms-of-service-page" class="footer-link">Terms of Service</a>
+        </div>
+        <p>&copy; 2024 AI Storysmith. All rights reserved.</p>
+    </footer>
 
     <script>
-        // API Configuration
-        const apiKey = "AIzaSyA6Epk2AsT7GoB7XeuzyivCkAtkJD13hzQ";
-        const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-        const audioApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
-
-        // DOM elements
-        const keywordsInput = document.getElementById('keywords');
-        const generatePromptBtn = document.getElementById('generatePromptBtn');
-        const generateStoryBtn = document.getElementById('generateStoryBtn');
-        const suggestIdeasBtn = document.getElementById('suggestIdeasBtn');
-        const categoryButtons = document.querySelectorAll('.category-button');
-        const categoryLoadingOverlay = document.getElementById('categoryLoadingOverlay');
-        
-        // New DOM elements for story customization
-        const storyLengthSelect = document.getElementById('storyLength');
-        const storyAudienceSelect = document.getElementById('storyAudience');
-        const storyFormatSelect = document.getElementById('storyFormat');
-        const storyGenreSelect = document.getElementById('storyGenre');
-
-        const audioIconContainer = document.getElementById('audioIconContainer');
-        const playIcon = document.getElementById('playIcon');
-        const pauseIcon = document.getElementById('pauseIcon');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const storyAudio = document.getElementById('storyAudio');
-
-        const promptOutput = document.getElementById('promptOutput');
-        const storyOutput = document.getElementById('storyOutput');
-        const suggestionOutput = document.getElementById('suggestionOutput');
-        const promptPlaceholderEl = document.getElementById('promptPlaceholder');
-        const storyPlaceholderEl = document.getElementById('storyPlaceholder');
-        const storyLoadingMessage = document.getElementById('storyLoadingMessage');
-
-        // Global state for audio timing and current category
-        let audioTimingInfo = [];
-        let currentLineIndex = -1;
-        let isAudioReady = false;
-        let currentCategory = 'general';
-
-        // Placeholder texts and button labels based on category
-        const categories = {
-            general: {
-                placeholder: "e.g., 'a magical lake, a small deer'",
-                storyBtnText: 'Write Story',
-                promptPlaceholder: "Your story prompt will appear here...",
-                storyPlaceholder: "Your complete story will appear here...",
-            },
-            childrensStories: {
-                placeholder: "e.g., 'a magical lake, a small deer, in Urdu'",
-                storyBtnText: "Write Children's Story",
-                promptPlaceholder: "Your children's story prompt will appear here...",
-                storyPlaceholder: "Your complete children's story will appear here...",
-            },
-            poems: {
-                placeholder: "e.g., 'night, stars, silence'",
-                storyBtnText: 'Write Poem',
-                promptPlaceholder: "Your poem prompt will appear here...",
-                storyPlaceholder: "Your complete poem will appear here...",
-            },
-            riddles: {
-                placeholder: "e.g., 'I have eyes, but cannot see'",
-                storyBtnText: 'Write Riddle',
-                promptPlaceholder: "Your riddle prompt will appear here...",
-                storyPlaceholder: "Your complete riddle will appear here...",
-            },
-            jokes: {
-                placeholder: "e.g., 'a man and a bear'",
-                storyBtnText: 'Write Joke',
-                promptPlaceholder: "Your joke prompt will appear here...",
-                storyPlaceholder: "Your complete joke will appear here...",
-            },
-            poetry: {
-                placeholder: "e.g., 'love, loneliness, rain'",
-                storyBtnText: 'Write Poetry',
-                promptPlaceholder: "Your poetry prompt will appear here...",
-                storyPlaceholder: "Your complete poetry will appear here...",
-            }
+        // === Core Application Logic & State ===
+        const state = {
+            isLoading: false,
+            audioPlayer: new Audio(),
+            currentAudioUrl: null,
+            currentAudioBuffer: null,
+            audioContext: new (window.AudioContext || window.webkitAudioContext)(),
+            audioSource: null,
+            isPlaying: false,
+            highlightedParagraph: null,
+            retryCount: 0,
+            maxRetries: 3,
+            baseLLMUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent',
+            ttsLLMUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent',
+            apiKey: "AIzaSyAgzC0jAg38JpROtewhuE0ZWEb358yF3j4",
         };
 
-        // Simple exponential backoff for retrying failed API calls
-        async function fetchWithExponentialBackoff(url, options, maxRetries = 5, delay = 1000) {
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response;
-                } catch (error) {
-                    if (i < maxRetries - 1) {
-                        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
-                    } else {
-                        throw error;
-                    }
+        // DOM Element references
+        const DOMElements = {
+            pages: document.querySelectorAll('.page'),
+            navLinks: document.querySelectorAll('.nav-link'),
+            keywords: document.getElementById('keywords'),
+            storyLength: document.getElementById('storyLength'),
+            storyAudience: document.getElementById('storyAudience'),
+            storyFormat: document.getElementById('storyFormat'),
+            storyGenre: document.getElementById('storyGenre'),
+            suggestIdeasBtn: document.getElementById('suggestIdeasBtn'),
+            generatePromptBtn: document.getElementById('generatePromptBtn'),
+            generateStoryBtn: document.getElementById('generateStoryBtn'),
+            promptOutput: document.getElementById('promptOutput'),
+            storyOutput: document.getElementById('storyOutput'),
+            storyLoadingMessage: document.getElementById('storyLoadingMessage'),
+            promptPlaceholder: document.getElementById('promptPlaceholder'),
+            storyPlaceholder: document.getElementById('storyPlaceholder'),
+            suggestionOutput: document.getElementById('suggestionOutput'),
+            categoryButtons: document.querySelectorAll('.category-button'),
+            categoryLoadingOverlay: document.getElementById('categoryLoadingOverlay'),
+            contactForm: document.getElementById('contactForm'),
+            contactMessageStatus: document.getElementById('contact-message-status'),
+            audioIconContainer: document.getElementById('audioIconContainer'),
+            playIcon: document.getElementById('playIcon'),
+            pauseIcon: document.getElementById('pauseIcon'),
+            loadingSpinner: document.getElementById('loadingSpinner')
+        };
+        
+        // Custom message box to replace alert() and confirm()
+        function showMessage(message, type = 'info') {
+            const messageElement = DOMElements.contactMessageStatus;
+            messageElement.textContent = message;
+            messageElement.style.color = type === 'error' ? '#f87171' : '#93c5fd';
+        }
+
+        // Sets the loading state for buttons and the main content area
+        function setLoading(isLoading, button) {
+            state.isLoading = isLoading;
+            if (button) {
+                button.disabled = isLoading;
+                button.innerHTML = isLoading ? `<svg class="loading-spinner w-5 h-5 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>` : button.dataset.originalText;
+            }
+        }
+
+        // === API Call Logic with Exponential Backoff ===
+        async function fetchWithBackoff(url, options, retries = 0) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`API call failed with status ${response.status}: ${errorText}`);
+                }
+                return await response.json();
+            } catch (error) {
+                if (retries < state.maxRetries) {
+                    const delay = Math.pow(2, retries) * 1000;
+                    console.warn(`API call failed. Retrying in ${delay / 1000}s...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchWithBackoff(url, options, retries + 1);
+                } else {
+                    console.error('Max retries exceeded.', error);
+                    throw error;
                 }
             }
         }
         
-        // --- PCM to WAV conversion helpers ---
+        // === Content Generation Functions ===
+        
+        // Utility function to get LLM content
+        async function generateContent(systemInstruction, userQuery, isStructured = false) {
+            let payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] },
+            };
+
+            if (isStructured) {
+                payload.generationConfig = {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: { "type": "STRING" }
+                    }
+                };
+            }
+            
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            };
+            
+            try {
+                const result = await fetchWithBackoff(state.baseLLMUrl + `?key=${state.apiKey}`, options);
+                const candidate = result.candidates?.[0];
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const text = candidate.content.parts[0].text;
+                    if (isStructured) {
+                        return JSON.parse(text);
+                    }
+                    return text;
+                }
+                throw new Error('No content found in the API response.');
+            } catch (e) {
+                console.error('Error generating content:', e);
+                return null;
+            }
+        }
+
+        // Handles the "Generate Prompt" button click
+        async function handleGeneratePrompt() {
+            setLoading(true, DOMElements.generatePromptBtn);
+            DOMElements.promptPlaceholder.textContent = 'Crafting your prompt...';
+            DOMElements.promptOutput.classList.add('fade-in');
+            
+            const keywords = DOMElements.keywords.value.trim();
+            const length = DOMElements.storyLength.value;
+            const audience = DOMElements.storyAudience.value;
+            const format = DOMElements.storyFormat.value;
+            const genre = DOMElements.storyGenre.value;
+
+            const systemPrompt = "You are a world-class prompt engineer. Your task is to turn a user's keywords into a detailed, creative, and compelling story prompt. The prompt should specify the setting, characters, and a central conflict. Do not write the story itself, just the prompt. The language should match the user's input.";
+            const userQuery = `Create a prompt for a ${length} story in the ${genre} genre, for an audience of ${audience}. The format should be a ${format}. The story must include the following keywords: ${keywords}.`;
+            
+            const prompt = await generateContent(systemPrompt, userQuery);
+            
+            if (prompt) {
+                DOMElements.promptOutput.textContent = prompt;
+                DOMElements.promptOutput.classList.remove('fade-in');
+            } else {
+                DOMElements.promptOutput.textContent = 'Failed to generate prompt. Please try again.';
+            }
+            setLoading(false, DOMElements.generatePromptBtn);
+        }
+
+        // Handles the "Write Story" button click
+        async function handleGenerateStory() {
+            setLoading(true, DOMElements.generateStoryBtn);
+            DOMElements.storyOutput.innerHTML = '';
+            DOMElements.storyLoadingMessage.classList.remove('hidden');
+            DOMElements.audioIconContainer.classList.add('hidden');
+            
+            const promptText = DOMElements.promptOutput.textContent.trim();
+            if (promptText === '' || promptText === DOMElements.promptPlaceholder.textContent) {
+                showMessage("Please generate a prompt first.", "error");
+                setLoading(false, DOMElements.generateStoryBtn);
+                DOMElements.storyLoadingMessage.classList.add('hidden');
+                return;
+            }
+
+            const systemPrompt = "You are a master storyteller. Your task is to write a compelling story based on the provided prompt. The story should be well-structured with a clear beginning, middle, and end. The language and style should match the prompt's specifications.";
+            
+            const story = await generateContent(systemPrompt, promptText);
+            
+            DOMElements.storyLoadingMessage.classList.add('hidden');
+            if (story) {
+                // Split the story into paragraphs and display them for potential highlighting
+                const paragraphs = story.split('\n\n');
+                DOMElements.storyOutput.innerHTML = '';
+                paragraphs.forEach((p, index) => {
+                    if (p.trim() !== '') {
+                        const pElement = document.createElement('p');
+                        pElement.textContent = p;
+                        pElement.classList.add('output-text');
+                        pElement.dataset.index = index;
+                        DOMElements.storyOutput.appendChild(pElement);
+                    }
+                });
+                DOMElements.storyOutput.classList.add('fade-in');
+                DOMElements.audioIconContainer.classList.remove('hidden');
+            } else {
+                DOMElements.storyOutput.innerHTML = '<p class="text-gray-400 italic">Failed to generate story. Please try again.</p>';
+            }
+            setLoading(false, DOMElements.generateStoryBtn);
+        }
+        
+        // Handles the "Suggest Ideas" button click
+        async function handleSuggestIdeas() {
+            setLoading(true, DOMElements.suggestIdeasBtn);
+            DOMElements.suggestionOutput.classList.add('hidden');
+            DOMElements.suggestionOutput.innerHTML = `<p class="text-center italic">Generating ideas...</p>`;
+
+            const keywords = DOMElements.keywords.value.trim();
+            const length = DOMElements.storyLength.value;
+            const audience = DOMElements.storyAudience.value;
+            const genre = DOMElements.storyGenre.value;
+
+            const systemPrompt = "You are a creative brain. Your task is to generate a list of 5 story ideas based on the user's input. The ideas should be a mix of creative prompts, but only provide the short, concise titles for the ideas in a JSON array format, e.g., ['Idea 1', 'Idea 2', 'Idea 3', 'Idea 4', 'Idea 5']. Do not include any other text or formatting. The ideas should be simple, single phrases.";
+            const userQuery = `Give me 5 story ideas for a ${length} story in the ${genre} genre, for an audience of ${audience}, using the keywords: ${keywords}.`;
+            
+            const ideas = await generateContent(systemPrompt, userQuery, true);
+
+            DOMElements.suggestionOutput.innerHTML = '';
+            if (ideas && Array.isArray(ideas)) {
+                DOMElements.suggestionOutput.classList.remove('hidden');
+                ideas.forEach((idea, index) => {
+                    const ideaButton = document.createElement('button');
+                    ideaButton.textContent = idea;
+                    ideaButton.classList.add('button-gradient', 'w-full', 'btn-suggest', 'suggestion-item');
+                    ideaButton.style.animationDelay = `${index * 0.1}s`;
+                    ideaButton.onclick = () => {
+                        DOMElements.keywords.value = idea;
+                        DOMElements.suggestionOutput.classList.add('hidden');
+                    };
+                    DOMElements.suggestionOutput.appendChild(ideaButton);
+                });
+            } else {
+                DOMElements.suggestionOutput.classList.remove('hidden');
+                DOMElements.suggestionOutput.innerHTML = '<p class="text-center italic text-gray-400">Could not generate suggestions. Try different keywords.</p>';
+            }
+            setLoading(false, DOMElements.suggestIdeasBtn);
+        }
+
+        // === TTS (Text-to-Speech) Logic ===
+
+        // Helper function to convert base64 to ArrayBuffer
         function base64ToArrayBuffer(base64) {
             const binaryString = window.atob(base64);
             const len = binaryString.length;
@@ -495,390 +808,78 @@
             return bytes.buffer;
         }
 
+        // Helper function to convert PCM to WAV format
         function pcmToWav(pcm16, sampleRate) {
-            const wavData = new Uint8Array(44 + pcm16.byteLength);
-            const view = new DataView(wavData.buffer);
+            const numChannels = 1;
+            const bitsPerSample = 16;
+            const wavData = new ArrayBuffer(44 + pcm16.length * 2);
+            const view = new DataView(wavData);
+            const dataLength = pcm16.length * 2;
+            const buffer = new Int16Array(pcm16);
 
             // RIFF chunk
-            view.setUint32(0, 0x52494646, true); // "RIFF"
-            view.setUint32(4, 36 + pcm16.byteLength, true); // file size
-            view.setUint32(8, 0x57415645, true); // "WAVE"
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + dataLength, true);
+            writeString(view, 8, 'WAVE');
 
             // fmt chunk
-            view.setUint32(12, 0x666d7420, true); // "fmt "
-            view.setUint32(16, 16, true); // chunk size
-            view.setUint16(20, 1, true); // audio format (1 = PCM)
-            view.setUint16(22, 1, true); // num channels
-            view.setUint32(24, sampleRate, true); // sample rate
-            view.setUint32(28, sampleRate * 2, true); // byte rate
-            view.setUint16(32, 2, true); // block align
-            view.setUint16(34, 16, true); // bits per sample
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true); // PCM format
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * numChannels * (bitsPerSample / 8), true);
+            view.setUint16(32, numChannels * (bitsPerSample / 8), true);
+            view.setUint16(34, bitsPerSample, true);
 
             // data chunk
-            view.setUint32(36, 0x64617461, true); // "data"
-            view.setUint32(40, pcm16.byteLength, true); // data size
+            writeString(view, 36, 'data');
+            view.setUint32(40, dataLength, true);
 
-            const pcm16Bytes = new Uint8Array(pcm16.buffer);
-            wavData.set(pcm16Bytes, 44);
+            // Write PCM data
+            for (let i = 0; i < buffer.length; i++) {
+                view.setInt16(44 + i * 2, buffer[i], true);
+            }
 
-            return new Blob([wavData], { type: 'audio/wav' });
+            return new Blob([view], { type: 'audio/wav' });
         }
 
-        // --- Core logic functions ---
-
-        // Function to detect language from keywords
-        function getLanguage(keywords) {
-            const lowerKeywords = keywords.toLowerCase();
-            if (lowerKeywords.includes('urdu') || lowerKeywords.includes('اردو') || lowerKeywords.includes('mein')) {
-                return 'ur';
-            }
-            if (lowerKeywords.includes('hindi') || lowerKeywords.includes('हिन्दी') || lowerKeywords.includes('me')) {
-                return 'hi';
-            }
-            if (lowerKeywords.includes('spanish') || lowerKeywords.includes('español')) {
-                return 'es';
-            }
-            if (lowerKeywords.includes('french') || lowerKeywords.includes('français')) {
-                return 'fr';
-            }
-            if (lowerKeywords.includes('german') || lowerKeywords.includes('deutsch')) {
-                return 'de';
-            }
-            return 'en';
-        }
-
-        // Dynamic prompts that can handle any language
-        const prompts = {
-            general: {
-                prompt: (keywords, length, audience, format, genre) => `Based on the following keywords, create a single, creative, and concise story prompt for a ${audience} audience, a ${length} length, in a ${format} format, and in the ${genre} genre. Do not include any extra text. Just the prompt itself. Keywords: ${keywords}`,
-                story: (keywords, length, audience, format, genre) => `Based on the following keywords, write a detailed and engaging story for a ${audience} audience, with a ${length} length, in a ${format} format, and in the ${genre} genre. The story should have a clear beginning, middle, and end. Use paragraphs to format the story. Keywords: ${keywords}`,
-                storyInstruction: "You are a master storyteller. Your task is to write a complete story from a given prompt. The story should be in the language specified in the prompt.",
-                ideas: () => "Suggest 5 creative themes or ideas for a story. Be concise and format the response as a numbered list with no extra text."
-            },
-            childrensStories: {
-                prompt: (keywords, length, audience, format, genre) => `Based on the following keywords, create a single, creative, and concise children's story prompt for a ${audience} audience, a ${length} length, in a ${format} format, and in the ${genre} genre. The story should be simple, positive, and have a clear moral lesson. Do not include any extra text. Just the prompt itself. Keywords: ${keywords}`,
-                story: (keywords, length, audience, format, genre) => `Based on the following keywords, write a detailed and engaging story for a ${audience} audience, with a ${length} length, in a ${format} format, and in the ${genre} genre. The story should be simple, positive, have a clear beginning, middle, and end, and a moral lesson. Use paragraphs to format the story. Keywords: ${keywords}`,
-                storyInstruction: "You are a storyteller for children. Write a positive and engaging children's story that has a clear moral lesson at the end. The story should be in the language specified.",
-                ideas: () => "Suggest 5 creative themes or ideas for a children's story. Be concise and format the response as a numbered list with no extra text."
-            },
-            poems: {
-                prompt: (keywords, length, audience, format, genre) => `Based on the following keywords, create a single, creative and concise poem prompt for a ${audience} audience, a ${length} length, in a ${format} format, and in the ${genre} genre. Do not include any extra text. Just the prompt itself. Keywords: ${keywords}`,
-                story: (keywords, length, audience, format, genre) => `Based on the following keywords, write a detailed and engaging short poem for a ${audience} audience, with a ${length} length, in a ${format} format, and in the ${genre} genre. The poem should have a clear beginning, middle, and end, and a moral lesson. Use paragraphs to format the poem. Keywords: ${keywords}`,
-                storyInstruction: "You are a master poet. Write a beautiful and emotionally resonant poem from the given keywords. The poem must be in the language specified.",
-                ideas: () => "Suggest 5 creative themes or ideas for a poem. Be concise and format the response as a numbered list with no extra text."
-            },
-            riddles: {
-                prompt: (keywords, length, audience, format, genre) => `Based on the following keywords, create a single, creative and concise riddle prompt for a ${audience} audience in the ${genre} genre. Do not include any extra text. Just the prompt itself. Keywords: ${keywords}`,
-                story: (keywords, length, audience, format, genre) => `Based on the following keywords, write a single, short and creative riddle for a ${audience} audience in the ${genre} genre. Do not include the answer in the riddle itself. Keywords: ${keywords}`,
-                storyInstruction: "You are an expert at writing riddles. Create a short and clever riddle based on the user's keywords, audience, and genre. Do not include the answer. The riddle must be in the language specified.",
-                ideas: () => "Suggest 5 creative themes or ideas for a riddle. Be concise and format the response as a numbered list with no extra text."
-            },
-            jokes: {
-                prompt: (keywords, length, audience, format, genre) => `Based on the following keywords, create a single, creative and concise joke prompt for a ${audience} audience in the ${genre} genre. Do not include any extra text. Just the prompt itself. Keywords: ${keywords}`,
-                story: (keywords, length, audience, format, genre) => `Based on the following keywords, write a short, clean, and funny joke for a ${audience} audience in the ${genre} genre. The joke should have a clear setup and punchline. Keywords: ${keywords}`,
-                storyInstruction: "You are a professional comedian. Write a short, clean, and funny joke based on the user's keywords, audience, and genre. The joke must be in the language specified.",
-                ideas: () => "Suggest 5 creative themes or ideas for a joke. Be concise and format the response as a numbered list with no extra text."
-            },
-            poetry: {
-                prompt: (keywords, length, audience, format, genre) => `Based on the following keywords, create a single, creative and concise poetry prompt for a ${audience} audience, a ${length} length, in a ${format} format, and in the ${genre} genre. Do not include any extra text. Just the prompt itself. Keywords: ${keywords}`,
-                story: (keywords, length, audience, format, genre) => `Based on the following keywords, write a detailed and engaging short poetry for a ${audience} audience, with a ${length} length, in a ${format} format, and in the ${genre} genre. The poetry should have a clear beginning, middle, and end, and a moral lesson. Use paragraphs to format the poetry. Keywords: ${keywords}`,
-                storyInstruction: "You are a master poet. Write a beautiful and emotionally resonant poetry from the given keywords. The poetry must be in the language specified.",
-                ideas: () => "Suggest 5 creative themes or ideas for a poetry. Be concise and format the response as a numbered list with no extra text."
-            }
-        };
-
-        // Event Listeners
-        generatePromptBtn.addEventListener('click', handleGeneratePrompt);
-        generateStoryBtn.addEventListener('click', handleGenerateStory);
-        suggestIdeasBtn.addEventListener('click', handleSuggestIdeas);
-        storyAudio.addEventListener('timeupdate', handleAudioTimeUpdate);
-        storyAudio.addEventListener('ended', handleAudioEnded);
-
-        // Add event listeners for category buttons
-        categoryButtons.forEach(button => {
-            button.addEventListener('click', handleCategorySelection);
-        });
-        
-        // Initial setup for the default category
-        window.addEventListener('load', () => {
-            handleCategorySelection({ target: document.getElementById('generalBtn') });
-        });
-
-        function handleCategorySelection(event) {
-            // First, show the loading overlay
-            categoryLoadingOverlay.classList.remove('hidden');
-
-            setTimeout(() => {
-                // Remove active class from all buttons
-                categoryButtons.forEach(btn => btn.classList.remove('active'));
-
-                // Add active class to the clicked button
-                event.target.classList.add('active');
-
-                // Update the current category and placeholder
-                const category = event.target.dataset.category;
-                currentCategory = category;
-                keywordsInput.placeholder = categories[category].placeholder;
-                generateStoryBtn.textContent = categories[category].storyBtnText;
-
-                // Update all placeholders based on the selected category
-                promptPlaceholderEl.textContent = categories[category].promptPlaceholder;
-                storyPlaceholderEl.textContent = categories[category].storyPlaceholder;
-                
-                // Clear previous outputs
-                promptOutput.innerHTML = `<p id="promptPlaceholder" class="text-gray-400 italic">${categories[category].promptPlaceholder}</p>`;
-                storyOutput.innerHTML = `<p id="storyPlaceholder" class="text-gray-400 italic">${categories[category].storyPlaceholder}</p>`;
-                suggestionOutput.innerHTML = '';
-                suggestionOutput.classList.add('hidden');
-                
-                // Hide audio icon
-                audioIconContainer.classList.add('hidden');
-
-                // Finally, hide the loading overlay
-                categoryLoadingOverlay.classList.add('hidden');
-            }, 1000); // Wait for 1 second
-        }
-
-        async function handleSuggestIdeas() {
-            const originalBtnText = suggestIdeasBtn.textContent;
-            suggestIdeasBtn.textContent = 'Generating...';
-            suggestIdeasBtn.disabled = true;
-            
-            suggestionOutput.classList.remove('hidden');
-            suggestionOutput.innerHTML = `<p class="text-gray-400 italic animate-pulse">Generating ideas...</p>`;
-            
-            const userPrompt = prompts[currentCategory]?.ideas() || prompts.general.ideas();
-
-            const payload = {
-                contents: [{ parts: [{ text: userPrompt }] }],
-                systemInstruction: {
-                    parts: [{ text: "You are a creative idea generator. Your task is to provide a list of ideas based on the user's prompt. Do not add any extra text or conversational phrases. Only provide the list." }]
-                }
-            };
-            
-            try {
-                const response = await fetchWithExponentialBackoff(textApiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const result = await response.json();
-                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-                
-                if (generatedText) {
-                    const ideas = generatedText.split('\n').filter(line => line.trim() !== '');
-                    suggestionOutput.innerHTML = `<p class="text-gray-300 font-semibold mb-2">Here are some ideas:</p>`;
-                    const ideasList = document.createElement('ul');
-                    ideasList.classList.add('list-disc', 'list-inside', 'space-y-2');
-                    ideas.forEach((idea, index) => {
-                        const li = document.createElement('li');
-                        li.textContent = idea.replace(/^\d+\.\s*/, '');
-                        li.classList.add('text-gray-300', 'suggestion-item');
-                        li.style.animationDelay = `${index * 0.1}s`;
-                        ideasList.appendChild(li);
-                    });
-                    suggestionOutput.appendChild(ideasList);
-                } else {
-                    suggestionOutput.innerHTML = `<p class="text-red-400">Failed to generate ideas. Please try again.</p>`;
-                }
-
-            } catch (error) {
-                console.error('Error generating ideas:', error);
-                suggestionOutput.innerHTML = `<p class="text-red-400">An error occurred. Please try again.</p>`;
-            } finally {
-                suggestIdeasBtn.textContent = originalBtnText;
-                suggestIdeasBtn.disabled = false;
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
             }
         }
 
-        async function handleGeneratePrompt() {
-            const keywords = keywordsInput.value.trim();
-            if (!keywords) {
-                promptOutput.innerHTML = `<p class="text-red-400">Please enter some keywords or topics first.</p>`;
-                return;
-            }
-            
-            const length = storyLengthSelect.value;
-            const audience = storyAudienceSelect.value;
-            const format = storyFormatSelect.value;
-            const genre = storyGenreSelect.value;
-
-            const originalPromptBtnText = generatePromptBtn.textContent;
-            generatePromptBtn.textContent = 'Generating...';
-            generatePromptBtn.disabled = true;
-            generateStoryBtn.disabled = false; // Re-enable story button
-            promptOutput.innerHTML = `<p class="text-gray-400 italic animate-pulse">Generating...</p>`;
-            storyOutput.innerHTML = `<p id="storyPlaceholder" class="text-gray-400 italic">${storyPlaceholderEl.textContent}</p>`;
-            audioIconContainer.classList.add('hidden');
-            
-            const userPrompt = prompts[currentCategory]?.prompt(keywords, length, audience, format, genre) || prompts.general.prompt(keywords, length, audience, format, genre);
-            const language = getLanguage(keywords);
-
-            const payload = {
-                contents: [{ parts: [{ text: userPrompt }] }],
-                systemInstruction: {
-                    parts: [{ text: "You are a creative writing assistant that generates great story prompts. The prompt should be in the language of the user." }]
-                }
-            };
-
-            try {
-                const response = await fetchWithExponentialBackoff(textApiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                if (generatedText) {
-                    promptOutput.innerHTML = `<p class="output-text font-bold text-gray-200">${generatedText}</p>`;
-                    promptOutput.classList.add('fade-in');
-                } else {
-                    promptOutput.innerHTML = `<p class="text-red-400">Failed to generate prompt. Please try again.</p>`;
-                }
-
-            } catch (error) {
-                console.error('Error generating prompt:', error);
-                promptOutput.innerHTML = `<p class="text-red-400">An error occurred. Please try again.</p>`;
-            } finally {
-                generatePromptBtn.textContent = originalPromptBtnText;
-                generatePromptBtn.disabled = false;
-            }
-        }
-
-        async function handleGenerateStory() {
-            const keywords = keywordsInput.value.trim();
-            if (!keywords) {
-                storyOutput.innerHTML = `<p class="text-red-400">Please enter some keywords or topics first.</p>`;
-                return;
-            }
-            
-            const originalStoryBtnText = generateStoryBtn.textContent;
-            generateStoryBtn.textContent = 'Writing...';
-            generateStoryBtn.disabled = true;
-            generatePromptBtn.disabled = true;
-            
-            // Show text loading state
-            storyOutput.innerHTML = `<p class="text-gray-400 italic animate-pulse">Writing story...</p>`;
-            storyLoadingMessage.classList.remove('hidden');
-            
-            audioIconContainer.classList.add('hidden');
-            playIcon.classList.add('hidden');
-            pauseIcon.classList.add('hidden');
-            loadingSpinner.classList.remove('hidden');
-            isAudioReady = false;
-            
-            const length = storyLengthSelect.value;
-            const audience = storyAudienceSelect.value;
-            const format = storyFormatSelect.value;
-            const genre = storyGenreSelect.value;
-
-            const userPrompt = prompts[currentCategory]?.story(keywords, length, audience, format, genre) || prompts.general.story(keywords, length, audience, format, genre);
-            const systemInstruction = prompts[currentCategory]?.storyInstruction || prompts.general.storyInstruction;
-            const language = getLanguage(keywords);
-
-            const payload = {
-                contents: [{ parts: [{ text: userPrompt }] }],
-                systemInstruction: {
-                    parts: [{ text: systemInstruction }]
-                }
-            };
-
-            try {
-                const response = await fetchWithExponentialBackoff(textApiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                if (generatedText) {
-                    let formattedContent = '';
-                    let paragraphs = [];
-
-                    // Formatting based on category
-                    switch(currentCategory) {
-                        case 'poems':
-                        case 'poetry':
-                            // For poems and poetry, preserve line breaks
-                            formattedContent = generatedText.replace(/\n/g, '<br>');
-                            paragraphs = generatedText.split('\n'); // Split by line for audio timing
-                            storyOutput.innerHTML = `<p class="output-text font-bold text-gray-200">${formattedContent}</p>`;
-                            break;
-                        case 'riddles':
-                        case 'jokes':
-                            // Simple formatting for short, direct text
-                            formattedContent = generatedText;
-                            paragraphs = [generatedText]; // Treat as a single block for audio timing
-                            storyOutput.innerHTML = `<p class="output-text font-bold text-gray-200">${formattedContent}</p>`;
-                            break;
-                        default:
-                            // Default to paragraph-based formatting for stories
-                            paragraphs = generatedText.split('\n\n');
-                            paragraphs.forEach((p, index) => {
-                                formattedContent += `<p id="line-${index}" class="mb-4 font-bold text-gray-200">${p}</p>`;
-                            });
-                            storyOutput.innerHTML = `<div class="output-text font-bold">${formattedContent}</div>`;
-                            break;
-                    }
-
-                    storyOutput.classList.add('fade-in');
-                    
-                    // Now, generate the audio
-                    await handleGenerateAudio(paragraphs);
-                    storyLoadingMessage.classList.add('hidden');
-
-                } else {
-                    storyOutput.innerHTML = `<p class="text-red-400">Failed to write story. Please try again.</p>`;
-                    storyLoadingMessage.classList.add('hidden');
-                }
-
-            } catch (error) {
-                console.error('Error generating story:', error);
-                storyOutput.innerHTML = `<p class="text-red-400">An error occurred. Please try again.</p>`;
-                storyLoadingMessage.classList.add('hidden');
-            } finally {
-                generateStoryBtn.textContent = originalStoryBtnText;
-                generateStoryBtn.disabled = false;
-                generatePromptBtn.disabled = false;
-            }
-        }
-        
-        async function handleGenerateAudio(paragraphs) {
-            const fullStoryText = paragraphs.join('\n\n');
+        async function getAudioFromText(text) {
+            DOMElements.playIcon.classList.add('hidden');
+            DOMElements.pauseIcon.classList.add('hidden');
+            DOMElements.loadingSpinner.classList.remove('hidden');
 
             const payload = {
                 contents: [{
-                    parts: [{ text: fullStoryText }]
+                    parts: [{ text: text }]
                 }],
                 generationConfig: {
                     responseModalities: ["AUDIO"],
                     speechConfig: {
                         voiceConfig: {
-                            prebuiltVoiceConfig: { voiceName: "Kore" }
+                            prebuiltVoiceConfig: { voiceName: "Iapetus" }
                         }
                     }
                 },
                 model: "gemini-2.5-flash-preview-tts"
             };
-
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            };
+            
             try {
-                const response = await fetchWithExponentialBackoff(audioApiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
+                const result = await fetchWithBackoff(state.ttsLLMUrl + `?key=${state.apiKey}`, options);
                 const part = result?.candidates?.[0]?.content?.parts?.[0];
                 const audioData = part?.inlineData?.data;
                 const mimeType = part?.inlineData?.mimeType;
-
-                audioTimingInfo = part?.speechMetadata?.timingInfo || [];
 
                 if (audioData && mimeType && mimeType.startsWith("audio/")) {
                     const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)[1], 10);
@@ -887,76 +888,228 @@
                     const wavBlob = pcmToWav(pcm16, sampleRate);
                     const audioUrl = URL.createObjectURL(wavBlob);
                     
-                    storyAudio.src = audioUrl;
-
-                    storyAudio.addEventListener('canplaythrough', () => {
-                        isAudioReady = true;
-                        playIcon.classList.remove('hidden');
-                        loadingSpinner.classList.add('hidden');
-                        audioIconContainer.classList.remove('hidden');
-                    }, { once: true });
-
+                    state.currentAudioUrl = audioUrl;
+                    DOMElements.loadingSpinner.classList.add('hidden');
+                    DOMElements.playIcon.classList.remove('hidden');
+                    return audioUrl;
                 } else {
-                    console.error('Audio data or mime type not found in response.');
-                    loadingSpinner.classList.add('hidden');
-                    const errorMessage = "Audio generate karne mein dikkat aayi hai. Kripya phir se koshish karen.";
-                    storyOutput.innerHTML += `<p class="text-red-400 mt-4">${errorMessage}</p>`;
+                    throw new Error('Invalid audio data received.');
                 }
-            } catch (error) {
-                console.error('Audio generate karne mein error:', error);
-                loadingSpinner.classList.add('hidden');
-                const errorMessage = "Audio generate karne mein ek error aayi hai. Kripya phir se koshish karen.";
-                storyOutput.innerHTML += `<p class="text-red-400 mt-4">${errorMessage}</p>`;
+            } catch (e) {
+                console.error("Error generating audio:", e);
+                showMessage("Failed to generate audio. Please try again.", "error");
+                DOMElements.loadingSpinner.classList.add('hidden');
+                DOMElements.playIcon.classList.remove('hidden');
+                return null;
             }
         }
         
-        function handlePlayAudio() {
-            if (!isAudioReady) {
-                console.warn('Audio is not ready yet.');
+        async function handlePlayAudio() {
+            const storyText = DOMElements.storyOutput.textContent.trim();
+            if (storyText === '' || storyText === DOMElements.storyPlaceholder.textContent) {
+                showMessage("There is no story to read.", "error");
                 return;
             }
 
-            if (storyAudio.paused) {
-                storyAudio.play();
-                playIcon.classList.add('hidden');
-                pauseIcon.classList.remove('hidden');
-            } else {
-                storyAudio.pause();
-                playIcon.classList.remove('hidden');
-                pauseIcon.classList.add('hidden');
+            if (state.isPlaying) {
+                state.audioPlayer.pause();
+                state.isPlaying = false;
+                DOMElements.playIcon.classList.remove('hidden');
+                DOMElements.pauseIcon.classList.add('hidden');
+                if (state.highlightedParagraph) {
+                    state.highlightedParagraph.classList.remove('highlighted-line');
+                }
+                return;
             }
-        }
 
-        function handleAudioTimeUpdate() {
-            const currentTime = storyAudio.currentTime * 1000; // Convert to milliseconds
-            
-            const lines = storyOutput.querySelectorAll('p');
-            lines.forEach(line => line.classList.remove('highlighted-line'));
-
-            let foundLine = false;
-            for (let i = 0; i < audioTimingInfo.length; i++) {
-                const info = audioTimingInfo[i];
-                if (currentTime >= info.startOffsetMs && currentTime <= info.endOffsetMs) {
-                    const lineElement = storyOutput.querySelector(`p#line-${i}`);
-                    if (lineElement) {
-                        lineElement.classList.add('highlighted-line');
-                        foundLine = true;
-                    }
-                    break;
+            if (!state.currentAudioUrl) {
+                const audioUrl = await getAudioFromText(storyText);
+                if (audioUrl) {
+                    state.audioPlayer.src = audioUrl;
+                } else {
+                    return;
                 }
             }
-            if (!foundLine && currentLineIndex !== -1) {
-                 storyOutput.querySelector(`#line-${currentLineIndex}`).classList.remove('highlighted-line');
-                 currentLineIndex = -1;
+            
+            state.audioPlayer.play();
+            state.isPlaying = true;
+            DOMElements.playIcon.classList.add('hidden');
+            DOMElements.pauseIcon.classList.remove('hidden');
+
+            const paragraphs = Array.from(DOMElements.storyOutput.querySelectorAll('p.output-text'));
+            let currentParagraphIndex = 0;
+
+            state.audioPlayer.onplay = () => {
+                if (paragraphs.length > 0) {
+                    state.highlightedParagraph = paragraphs[0];
+                    state.highlightedParagraph.classList.add('highlighted-line');
+                }
+            };
+            
+            // Simple highlighting logic based on time
+            state.audioPlayer.ontimeupdate = () => {
+                if (state.audioPlayer.paused) return;
+
+                const elapsedTime = state.audioPlayer.currentTime;
+                const duration = state.audioPlayer.duration;
+                if (duration > 0) {
+                    const progress = elapsedTime / duration;
+                    const nextIndex = Math.floor(progress * paragraphs.length);
+                    if (nextIndex > currentParagraphIndex && nextIndex < paragraphs.length) {
+                        if (state.highlightedParagraph) {
+                            state.highlightedParagraph.classList.remove('highlighted-line');
+                        }
+                        currentParagraphIndex = nextIndex;
+                        state.highlightedParagraph = paragraphs[currentParagraphIndex];
+                        state.highlightedParagraph.classList.add('highlighted-line');
+                    }
+                }
+            };
+
+            state.audioPlayer.onended = () => {
+                state.isPlaying = false;
+                DOMElements.playIcon.classList.remove('hidden');
+                DOMElements.pauseIcon.classList.add('hidden');
+                if (state.highlightedParagraph) {
+                    state.highlightedParagraph.classList.remove('highlighted-line');
+                }
+            };
+        }
+
+        // === Event Listeners and UI Logic ===
+
+        // Page navigation handler
+        function navigateToPage(pageId) {
+            DOMElements.pages.forEach(page => {
+                page.classList.add('hidden');
+            });
+            document.getElementById(pageId).classList.remove('hidden');
+
+            DOMElements.navLinks.forEach(link => {
+                if (link.href.endsWith(pageId)) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Sticky header logic
+        let lastScrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.modern-nav');
+            if (lastScrollY < window.scrollY && window.scrollY > 100) {
+                header.classList.add('header-hidden');
+            } else {
+                header.classList.remove('header-hidden');
             }
-        }
-        
-        function handleAudioEnded() {
-            storyOutput.querySelectorAll('p').forEach(line => line.classList.remove('highlighted-line'));
-            playIcon.classList.remove('hidden');
-            pauseIcon.classList.add('hidden');
-            currentLineIndex = -1;
-        }
+            lastScrollY = window.scrollY;
+        });
+
+        // Category button click handler
+        DOMElements.categoryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                DOMElements.categoryButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                // Simulate loading for the category content
+                DOMElements.categoryLoadingOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    DOMElements.categoryLoadingOverlay.classList.add('hidden');
+                    const category = button.dataset.category;
+                    let placeholderText = '';
+                    switch (category) {
+                        case 'childrensStories':
+                            placeholderText = 'e.g., a friendly dragon, a lost toy, in Hindi';
+                            break;
+                        case 'poems':
+                            placeholderText = 'e.g., the stars at night, a quiet forest, a feeling of sadness, in Spanish';
+                            break;
+                        case 'riddles':
+                            placeholderText = 'e.g., no voice, but speaks to all, in Farsi';
+                            break;
+                        case 'jokes':
+                            placeholderText = 'e.g., a chicken crossing the road, a silly pun, in French';
+                            break;
+                        case 'poetry':
+                            placeholderText = 'e.g., a gentle breeze, forgotten memories, in Japanese';
+                            break;
+                        default:
+                            placeholderText = 'e.g., a magical lake, a small deer, in Urdu';
+                            break;
+                    }
+                    DOMElements.keywords.placeholder = placeholderText;
+                }, 1000);
+            });
+        });
+
+        // Contact form submission handler
+        DOMElements.contactForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = new FormData(form);
+            const statusMessage = DOMElements.contactMessageStatus;
+
+            try {
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    body: data,
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (response.ok) {
+                    form.reset();
+                    showMessage("Thanks for your message! We'll be in touch soon.", "success");
+                } else {
+                    const responseData = await response.json();
+                    if (responseData.errors) {
+                        throw new Error(responseData.errors.map(error => error.message).join(", "));
+                    } else {
+                        throw new Error("Form submission failed.");
+                    }
+                }
+            } catch (error) {
+                console.error('Form submission error:', error);
+                showMessage("Oops! There was a problem with your submission.", "error");
+            }
+        });
+
+        // Initial setup and event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Store original button text
+            DOMElements.generatePromptBtn.dataset.originalText = DOMElements.generatePromptBtn.innerHTML;
+            DOMElements.generateStoryBtn.dataset.originalText = DOMElements.generateStoryBtn.innerHTML;
+            DOMElements.suggestIdeasBtn.dataset.originalText = DOMElements.suggestIdeasBtn.innerHTML;
+
+            // Page navigation event listeners
+            DOMElements.navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = link.getAttribute('href').substring(1);
+                    navigateToPage(pageId);
+                });
+            });
+
+            // Set initial active nav link
+            const initialPage = window.location.hash.substring(1) || 'home-page';
+            navigateToPage(initialPage);
+
+            // Button click handlers
+            DOMElements.generatePromptBtn.addEventListener('click', handleGeneratePrompt);
+            DOMElements.generateStoryBtn.addEventListener('click', handleGenerateStory);
+            DOMElements.suggestIdeasBtn.addEventListener('click', handleSuggestIdeas);
+
+            // Footer navigation
+            document.querySelector('footer').addEventListener('click', (e) => {
+                if (e.target.tagName === 'A' && e.target.getAttribute('href').startsWith('#')) {
+                    e.preventDefault();
+                    const pageId = e.target.getAttribute('href').substring(1);
+                    navigateToPage(pageId);
+                }
+            });
+        });
+
     </script>
 </body>
 </html>
