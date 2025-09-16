@@ -72,6 +72,18 @@
             --color-from: #d946ef;
             --color-to: #c026d3;
         }
+        .btn-save {
+            --color-from: #10b981;
+            --color-to: #059669;
+        }
+        .btn-audio {
+            --color-from: #38bdf8;
+            --color-to: #0ea5e9;
+        }
+        .btn-auth {
+            --color-from: #f59e0b;
+            --color-to: #d97706;
+        }
         .social-icon {
             font-size: 1.5rem;
             color: #93c5fd;
@@ -124,27 +136,38 @@
         }
 
         /* Highlighting for audio playback */
-        .highlighted-line {
+        .highlighted-word {
             background-color: #4a5568; /* a darker slate-gray */
-            border-radius: 0.5rem;
-            padding: 0.25rem 0.5rem;
-            transition: background-color 0.3s ease-in-out;
+            border-radius: 0.25rem;
+            padding: 0.1rem 0.25rem;
+            transition: background-color 0.1s ease-in-out;
         }
+        
+        /* Modern audio button styles */
         .audio-icon-container {
             position: absolute;
             bottom: 1rem;
             right: 1rem;
             cursor: pointer;
             z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 9999px;
+            background-color: #38bdf8;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
+            transition: all 0.3s ease-in-out;
+        }
+        .audio-icon-container:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(56, 189, 248, 0.6);
         }
         .audio-icon-container svg {
-            width: 2rem;
-            height: 2rem;
-            color: #93c5fd; /* Lighter icon color */
-            transition: color 0.2s ease-in-out;
-        }
-        .audio-icon-container:hover svg {
-            color: #60a5fa;
+            width: 1.5rem;
+            height: 1.5rem;
+            color: #1a202c;
         }
         .audio-icon-container .loading-spinner {
             animation: spin 1s linear infinite;
@@ -222,7 +245,7 @@
             animation: spin 1s linear infinite;
         }
 
-        /* Styles for the modern header navigation */
+        /* Modern header navigation styles */
         .modern-nav {
             background-color: #2d3748;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -296,6 +319,10 @@
                     <li><a href="#about-us-page" class="nav-link" id="nav-about">About Us</a></li>
                     <li><a href="#blog-page" class="nav-link" id="nav-blog">Blog</a></li>
                     <li><a href="#contact-us-page" class="nav-link" id="nav-contact">Contact Us</a></li>
+                    <li id="myStoriesNav" class="hidden"><a href="#my-stories-page" class="nav-link" id="nav-my-stories">My Stories</a></li>
+                    <li id="loginNav"><a href="#login-page" class="nav-link" id="nav-login">Login</a></li>
+                    <li id="registerNav" class="hidden"><a href="#register-page" class="nav-link" id="nav-register">Register</a></li>
+                    <li id="logoutNav" class="hidden"><button id="logoutBtn" class="nav-link">Logout</button></li>
                 </ul>
             </nav>
         </div>
@@ -331,17 +358,34 @@
                     <div class="category-spinner"></div>
                 </div>
                 <section class="space-y-4">
-                    <label for="keywords" class="block text-lg font-semibold text-gray-300">Enter your keywords and language (e.g., 'a magical lake, a small deer, in Urdu')</label>
+                    <label for="keywords" class="block text-lg font-semibold text-gray-300">Enter your keywords</label>
                     <textarea id="keywords" rows="3" class="w-full p-4 rounded-xl bg-gray-700 border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors placeholder:text-gray-400" placeholder="e.g., 'a magical lake, a small deer'"></textarea>
                     
-                    <!-- New controls for Length, Audience, Format, and Genre -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                    <!-- New controls for Language, Length, Audience, Format, and Genre -->
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
+                        <div>
+                            <label for="storyLanguage" class="block text-sm font-medium text-gray-400 mb-1">Language</label>
+                            <select id="storyLanguage" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="en-US">English</option>
+                                <option value="ur-PK">Urdu</option>
+                                <option value="ar-EG">Arabic</option>
+                                <option value="de-DE">German</option>
+                                <option value="es-US">Spanish</option>
+                                <option value="fr-FR">French</option>
+                                <option value="hi-IN">Hindi</option>
+                                <option value="ja-JP">Japanese</option>
+                                <option value="ko-KR">Korean</option>
+                                <option value="pt-BR">Portuguese</option>
+                                <option value="ru-RU">Russian</option>
+                                <option value="zh-CN">Chinese</option>
+                            </select>
+                        </div>
                         <div>
                             <label for="storyLength" class="block text-sm font-medium text-gray-400 mb-1">Length</label>
                             <select id="storyLength" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="short">Short</option>
-                                <option value="medium">Medium</option>
-                                <option value="long">Long</option>
+                                <option value="short">Short (approx. 300 words)</option>
+                                <option value="medium">Medium (approx. 600 words)</option>
+                                <option value="long">Long (approx. 1000 words)</option>
                             </select>
                         </div>
                         <div>
@@ -414,33 +458,73 @@
                     <!-- Story Output with a dedicated loading message area -->
                     <div id="storyOutput" class="relative min-h-[200px] p-6 rounded-xl bg-gray-700 border border-gray-600 shadow-inner">
                         <p id="storyPlaceholder" class="text-gray-400 italic">Your complete story will appear here...</p>
-                        <div id="storyLoadingMessage" class="absolute inset-0 flex items-center justify-center p-4 bg-gray-700 bg-opacity-80 rounded-xl hidden">
+                        <!-- New and improved loading state -->
+                        <div id="storyLoadingOverlay" class="absolute inset-0 flex items-center justify-center p-4 bg-gray-700 bg-opacity-80 rounded-xl hidden">
                             <div class="text-center text-gray-300">
-                                <svg class="loading-spinner mx-auto mb-2 w-8 h-8 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                                </svg>
+                                <div class="category-spinner mx-auto mb-4"></div>
+                                <p class="text-lg font-semibold">Crafting your story...</p>
+                                <p class="text-sm">This may take a moment depending on the length.</p>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- The audio icon container is now a sibling to the story output -->
-                    <div id="audioIconContainer" class="audio-icon-container hidden" onclick="handlePlayAudio()">
-                        <!-- Play Icon -->
-                        <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                            <path fill-rule="evenodd" d="M11.66 2.016a.75.75 0 0 1 .75 0l9.366 5.378a.75.75 0 0 1 0 1.284l-9.366 5.378a.75.75 0 0 1-.75 0L2.308 8.678a.75.75 0 0 1 0-1.284L11.66 2.016Z" clip-rule="evenodd" />
-                            <path d="M11.99 19.34a.75.75 0 0 1 .75 0l9.366 5.378a.75.75 0 0 1 0 1.284l-9.366 5.378a.75.75 0 0 1-.75 0L2.64 25.996a.75.75 0 0 1 0-1.284L11.99 19.34Z" />
-                        </svg>
-                        <!-- Pause Icon (hidden initially) -->
-                        <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 hidden">
-                            <path fill-rule="evenodd" d="M6.75 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75V5.25Zm7.5 0A.75.75 0 0 1 15 4.5h1.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H15a.75.75 0 0 1-.75-.75V5.25Z" clip-rule="evenodd" />
-                        </svg>
-                        <!-- Loading Spinner (hidden initially) -->
-                        <svg id="loadingSpinner" class="loading-spinner w-6 h-6 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                        </svg>
+                    <!-- Separate buttons for save and audio playback -->
+                    <div id="storyActions" class="flex space-x-4 justify-end mt-4 hidden">
+                        <button id="saveStoryBtn" class="button-gradient btn-save">
+                            Save Story
+                        </button>
+                        <button id="audioControlBtn" class="button-gradient btn-audio flex items-center justify-center">
+                            <span id="audioButtonText" class="mr-2">Download Audio (MP3)</span>
+                            <svg id="downloadIcon" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 17.25l-4.5-4.5h3v-6h3v6h3zM12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zm0-2a7 7 0 1 1 0-14 7 7 0 0 1 0 14z"/>
+                            </svg>
+                            <svg id="audioLoadingSpinner" class="animate-spin w-5 h-5 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                            </svg>
+                        </button>
                     </div>
                 </section>
             </main>
+        </div>
+
+        <!-- Login Page -->
+        <div id="login-page" class="page hidden">
+            <div class="page-content text-center">
+                <h2 class="text-3xl font-bold gradient-text mb-4">Login</h2>
+                <form id="loginForm" class="space-y-4 max-w-sm mx-auto">
+                    <input type="email" id="loginEmail" placeholder="Email" required class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="password" id="loginPassword" placeholder="Password" required class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p id="loginMessage" class="text-sm"></p>
+                    <button type="submit" class="w-full button-gradient btn-auth">Login</button>
+                    <p class="text-gray-400">Don't have an account? <a href="#register-page" class="text-blue-400 hover:underline">Register here</a></p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Registration Page -->
+        <div id="register-page" class="page hidden">
+            <div class="page-content text-center">
+                <h2 class="text-3xl font-bold gradient-text mb-4">Register</h2>
+                <form id="registerForm" class="space-y-4 max-w-sm mx-auto">
+                    <input type="email" id="registerEmail" placeholder="Email" required class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="password" id="registerPassword" placeholder="Password" required class="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p id="registerMessage" class="text-sm"></p>
+                    <button type="submit" class="w-full button-gradient btn-auth">Register</button>
+                    <p class="text-gray-400">Already have an account? <a href="#login-page" class="text-blue-400 hover:underline">Login here</a></p>
+                </form>
+            </div>
+        </div>
+        
+        <!-- My Stories Page -->
+        <div id="my-stories-page" class="page hidden">
+            <div class="page-content">
+                <h2 class="text-3xl font-bold gradient-text mb-4">My Stories</h2>
+                <p class="text-gray-400 mb-6">Your unique user ID: <span id="userIdDisplay" class="font-bold text-blue-300"></span></p>
+                <div id="storiesList" class="space-y-8">
+                    <p class="text-gray-400 italic text-center" id="storiesPlaceholder">You have no stories saved yet.</p>
+                    <!-- Saved stories will be dynamically added here -->
+                </div>
+            </div>
         </div>
 
         <!-- About Us Page -->
@@ -519,16 +603,17 @@
                 <p class="text-gray-300 mb-4">We collect information that you voluntarily provide when you use our services, such as the keywords and language you enter to generate stories. This data is used solely to provide and improve our services to you. We do not sell or share your personal information with third parties.</p>
                 <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">How We Use Your Information</h3>
                 <p class="text-gray-300 mb-4">The information you provide is used to:
-                <ul class="list-disc list-inside text-gray-300 ml-4">
-                    <li>Generate creative content based on your requests.</li>
-                    <li>Improve the performance and accuracy of our AI models.</li>
-                    <li>Provide customer support and respond to your inquiries.</li>
-                </ul>
+                    <ul>
+                        <li>Generate and provide the requested stories and prompts.</li>
+                        <li>Personalize your experience and save your stories if you choose to.</li>
+                        <li>Analyze usage patterns to improve our service offerings.</li>
+                    </ul>
                 </p>
                 <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Data Security</h3>
-                <p class="text-gray-300 mb-4">We implement a variety of security measures to maintain the safety of your personal information. All data transmissions are encrypted. We also use secure storage to protect your data from unauthorized access.</p>
+                <p class="text-gray-300 mb-4">We employ industry-standard security measures to protect your information from unauthorized access, alteration, disclosure, or destruction. We use Firebase for user authentication and Firestore for data storage, which provides a secure and reliable infrastructure.</p>
                 <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Changes to This Policy</h3>
-                <p class="text-gray-300 mb-4">We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page. You are advised to review this policy periodically for any changes.</p>
+                <p class="text-gray-300 mb-4">We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page. You are advised to review this policy periodically for any changes.
+                </p>
             </div>
         </div>
 
@@ -536,579 +621,747 @@
         <div id="terms-of-service-page" class="page hidden">
             <div class="page-content">
                 <h2 class="text-3xl font-bold gradient-text mb-4">Terms of Service</h2>
-                <p class="text-gray-300 mb-4">Welcome to AI Storysmith! By accessing or using our service, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, you may not use our services.</p>
-                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Use of Service</h3>
-                <p class="text-gray-300 mb-4">You agree to use AI Storysmith for lawful purposes only and in a way that does not infringe upon the rights of others. You are responsible for all content you input into the service. You may not use the service to generate content that is illegal, defamatory, or harmful.</p>
-                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Intellectual Property</h3>
-                <p class="text-gray-300 mb-4">All intellectual property rights in the service and its original content belong to AI Storysmith. The stories and prompts generated are based on your input, and you retain rights to the content you create. However, we reserve the right to use generated content for training and improving our AI models in an anonymized manner.</p>
-                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Limitation of Liability</h3>
-                <p class="text-gray-300 mb-4">AI Storysmith is provided on an "as is" and "as available" basis. We do not warrant that the service will be uninterrupted, error-free, or secure. We are not liable for any damages that may arise from your use of the service.</p>
-                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Governing Law</h3>
-                <p class="text-gray-300 mb-4">These Terms shall be governed by and construed in accordance with the laws of the jurisdiction where AI Storysmith is headquartered, without regard to its conflict of law provisions.</p>
+                <p class="text-gray-300 mb-4">Welcome to AI Storysmith! These terms and conditions outline the rules and regulations for the use of our website and services.</p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">1. Acceptance of Terms</h3>
+                <p class="text-gray-300 mb-4">By accessing this website, you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access the service.</p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">2. Use of Service</h3>
+                <p class="text-gray-300 mb-4">AI Storysmith provides a tool for generating creative content. You are responsible for all content you generate and for your use of the service. You agree not to use the service for any illegal or unauthorized purpose.</p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">3. Intellectual Property</h3>
+                <p class="text-gray-300 mb-4">The content generated by our AI is for your personal, non-commercial use. While we provide the tool, you are the author of the final work and are free to use it as you see fit.</p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">4. Disclaimers</h3>
+                <p class="text-gray-300 mb-4">The service is provided on an "as is" and "as available" basis without any warranties, expressed or implied. We do not guarantee that the service will be uninterrupted, secure, or free from errors.</p>
+                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">5. Limitation of Liability</h3>
+                <p class="text-gray-300 mb-4">In no event shall AI Storysmith or its suppliers be liable for any damages arising out of the use or inability to use the materials on our website.</p>
             </div>
         </div>
-
+        
     </div>
-    
+
     <!-- Footer -->
-    <footer class="w-full text-center text-gray-500 mt-8 mb-4">
-        <div class="flex justify-center space-x-6 mb-4">
-            <a href="#" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-            <a href="#" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+    <footer class="w-full bg-gray-800 text-gray-400 py-6 mt-auto">
+        <div class="container mx-auto text-center flex flex-col sm:flex-row items-center justify-between px-4 sm:px-0">
+            <p class="text-sm">&copy; 2025 AI Storysmith. All Rights Reserved.</p>
+            <div class="flex space-x-6 mt-4 sm:mt-0">
+                <a href="#privacy-policy-page" class="footer-link">Privacy Policy</a>
+                <a href="#terms-of-service-page" class="footer-link">Terms of Service</a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            </div>
         </div>
-        <div class="flex flex-wrap justify-center space-x-4 mb-2">
-            <a href="#privacy-policy-page" class="footer-link">Privacy Policy</a>
-            <a href="#terms-of-service-page" class="footer-link">Terms of Service</a>
-        </div>
-        <p>&copy; 2024 AI Storysmith. All rights reserved.</p>
     </footer>
 
-    <script>
-        // === Core Application Logic & State ===
-        const state = {
-            isLoading: false,
-            audioPlayer: new Audio(),
-            currentAudioUrl: null,
-            currentAudioBuffer: null,
-            audioContext: new (window.AudioContext || window.webkitAudioContext)(),
-            audioSource: null,
-            isPlaying: false,
-            highlightedParagraph: null,
-            retryCount: 0,
-            maxRetries: 3,
-            baseLLMUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent',
-            ttsLLMUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent',
-            apiKey: "AIzaSyAgzC0jAg38JpROtewhuE0ZWEb358yF3j4",
+    <!-- Firebase SDK Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, getDocs, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- Globals & Initializations ---
+        let app;
+        let db;
+        let auth;
+        let userId = null;
+        let currentStoryText = "";
+        
+        const WORD_COUNTS = {
+            'short': 300,
+            'medium': 600,
+            'long': 1000
         };
 
-        // DOM Element references
-        const DOMElements = {
-            pages: document.querySelectorAll('.page'),
-            navLinks: document.querySelectorAll('.nav-link'),
-            keywords: document.getElementById('keywords'),
-            storyLength: document.getElementById('storyLength'),
-            storyAudience: document.getElementById('storyAudience'),
-            storyFormat: document.getElementById('storyFormat'),
-            storyGenre: document.getElementById('storyGenre'),
-            suggestIdeasBtn: document.getElementById('suggestIdeasBtn'),
-            generatePromptBtn: document.getElementById('generatePromptBtn'),
-            generateStoryBtn: document.getElementById('generateStoryBtn'),
-            promptOutput: document.getElementById('promptOutput'),
-            storyOutput: document.getElementById('storyOutput'),
-            storyLoadingMessage: document.getElementById('storyLoadingMessage'),
-            promptPlaceholder: document.getElementById('promptPlaceholder'),
-            storyPlaceholder: document.getElementById('storyPlaceholder'),
-            suggestionOutput: document.getElementById('suggestionOutput'),
-            categoryButtons: document.querySelectorAll('.category-button'),
-            categoryLoadingOverlay: document.getElementById('categoryLoadingOverlay'),
-            contactForm: document.getElementById('contactForm'),
-            contactMessageStatus: document.getElementById('contact-message-status'),
-            audioIconContainer: document.getElementById('audioIconContainer'),
-            playIcon: document.getElementById('playIcon'),
-            pauseIcon: document.getElementById('pauseIcon'),
-            loadingSpinner: document.getElementById('loadingSpinner')
-        };
+        // UI elements
+        const pages = document.querySelectorAll('.page');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const loginNav = document.getElementById('loginNav');
+        const registerNav = document.getElementById('registerNav');
+        const myStoriesNav = document.getElementById('myStoriesNav');
+        const logoutNav = document.getElementById('logoutNav');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const storyOutput = document.getElementById('storyOutput');
+        const storyPlaceholder = document.getElementById('storyPlaceholder');
+        const storyLoadingOverlay = document.getElementById('storyLoadingOverlay');
+        const keywordsInput = document.getElementById('keywords');
+        const generatePromptBtn = document.getElementById('generatePromptBtn');
+        const generateStoryBtn = document.getElementById('generateStoryBtn');
+        const suggestIdeasBtn = document.getElementById('suggestIdeasBtn');
+        const promptOutput = document.getElementById('promptOutput');
+        const promptPlaceholder = document.getElementById('promptPlaceholder');
+        const suggestionOutput = document.getElementById('suggestionOutput');
+        const saveStoryBtn = document.getElementById('saveStoryBtn');
+        const storiesList = document.getElementById('storiesList');
+        const storiesPlaceholder = document.getElementById('storiesPlaceholder');
+        const storyActions = document.getElementById('storyActions');
+        const audioControlBtn = document.getElementById('audioControlBtn');
+        const audioButtonText = document.getElementById('audioButtonText');
+        const downloadIcon = document.getElementById('downloadIcon');
+        const audioLoadingSpinner = document.getElementById('audioLoadingSpinner');
         
-        // Custom message box to replace alert() and confirm()
-        function showMessage(message, type = 'info') {
-            const messageElement = DOMElements.contactMessageStatus;
-            messageElement.textContent = message;
-            messageElement.style.color = type === 'error' ? '#f87171' : '#93c5fd';
-        }
-
-        // Sets the loading state for buttons and the main content area
-        function setLoading(isLoading, button) {
-            state.isLoading = isLoading;
-            if (button) {
-                button.disabled = isLoading;
-                button.innerHTML = isLoading ? `<svg class="loading-spinner w-5 h-5 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>` : button.dataset.originalText;
-            }
-        }
-
-        // === API Call Logic with Exponential Backoff ===
-        async function fetchWithBackoff(url, options, retries = 0) {
-            try {
-                const response = await fetch(url, options);
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`API call failed with status ${response.status}: ${errorText}`);
-                }
-                return await response.json();
-            } catch (error) {
-                if (retries < state.maxRetries) {
-                    const delay = Math.pow(2, retries) * 1000;
-                    console.warn(`API call failed. Retrying in ${delay / 1000}s...`);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    return fetchWithBackoff(url, options, retries + 1);
-                } else {
-                    console.error('Max retries exceeded.', error);
-                    throw error;
-                }
-            }
-        }
-        
-        // === Content Generation Functions ===
-        
-        // Utility function to get LLM content
-        async function generateContent(systemInstruction, userQuery, isStructured = false) {
-            let payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: { parts: [{ text: systemInstruction }] },
-            };
-
-            if (isStructured) {
-                payload.generationConfig = {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "ARRAY",
-                        items: { "type": "STRING" }
+        // Authentication and Firestore Setup
+        const initializeFirebase = async () => {
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+            
+            if (firebaseConfig) {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // This listener runs every time the authentication state changes
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        // User is authenticated
+                        userId = user.uid;
+                        console.log("User is authenticated:", userId);
+                        updateAuthUI(true);
+                        // Only attach the Firestore listener when we have a valid user
+                        listenForStories();
+                    } else {
+                        // User is not authenticated
+                        userId = null;
+                        console.log("User is not authenticated. Signing in anonymously...");
+                        try {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                                console.log("Signed in with custom token.");
+                            } else {
+                                await signInAnonymously(auth);
+                                console.log("Signed in anonymously.");
+                            }
+                        } catch (error) {
+                            console.error("Authentication failed:", error);
+                        }
+                        updateAuthUI(false);
+                        // Do not listen to stories if no user is signed in
+                        storiesList.innerHTML = '<p class="text-gray-400 italic text-center" id="storiesPlaceholder">Sign in to save and view your stories.</p>';
                     }
-                };
+                });
+            } else {
+                console.error("Firebase config is missing.");
+                updateAuthUI(false);
             }
-            
-            const options = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+        };
+
+        const updateAuthUI = (isAuthenticated) => {
+            if (isAuthenticated) {
+                loginNav.classList.add('hidden');
+                registerNav.classList.add('hidden');
+                myStoriesNav.classList.remove('hidden');
+                logoutNav.classList.remove('hidden');
+                userIdDisplay.textContent = auth.currentUser.uid;
+            } else {
+                loginNav.classList.remove('hidden');
+                registerNav.classList.remove('hidden');
+                myStoriesNav.classList.add('hidden');
+                logoutNav.classList.add('hidden');
+                userIdDisplay.textContent = 'Sign in to save stories.';
+            }
+        };
+
+        // Story management with Firestore
+        const getStoriesCollectionRef = () => {
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            // Ensure userId is not null before creating the path
+            if (!userId) {
+                console.error("Cannot get stories collection: userId is null.");
+                return null;
+            }
+            return collection(db, `artifacts/${appId}/users/${userId}/my-stories`);
+        };
+
+        const listenForStories = () => {
+            if (!db || !userId) return;
+            const storiesRef = getStoriesCollectionRef();
+            if (!storiesRef) {
+                return;
+            }
+            onSnapshot(storiesRef, (snapshot) => {
+                const stories = [];
+                snapshot.forEach(doc => {
+                    stories.push({ id: doc.id, ...doc.data() });
+                });
+                renderStories(stories);
+            }, (error) => {
+                console.error("Error listening to stories:", error);
+            });
+        };
+        
+        const renderStories = (stories) => {
+            storiesList.innerHTML = '';
+            if (stories.length === 0) {
+                storiesPlaceholder.classList.remove('hidden');
+                return;
+            }
+            storiesPlaceholder.classList.add('hidden');
+            stories.forEach(story => {
+                const formattedDate = story.timestamp?.seconds ? new Date(story.timestamp.seconds * 1000).toLocaleString() : 'N/A';
+                const storyElement = document.createElement('div');
+                storyElement.className = 'card p-6 rounded-xl flex flex-col space-y-4';
+                storyElement.innerHTML = `
+                    <p class="text-sm text-gray-400">Saved: ${formattedDate}</p>
+                    <div class="output-text">${story.text.replace(/\n/g, '<br>')}</div>
+                    <div class="flex justify-end space-x-2">
+                        <button class="button-gradient btn-prompt text-xs p-2 copy-story-btn">Copy</button>
+                        <button class="button-gradient btn-story text-xs p-2 download-mp3-btn" data-text="${escapeHtml(story.text)}">Download Audio (MP3)</button>
+                        <button class="button-gradient btn-save text-xs p-2 delete-story-btn">Delete</button>
+                    </div>
+                `;
+                storiesList.appendChild(storyElement);
+                
+                storyElement.querySelector('.copy-story-btn').addEventListener('click', () => {
+                    copyText(story.text);
+                });
+                storyElement.querySelector('.download-mp3-btn').addEventListener('click', async (event) => {
+                    const textToConvert = event.target.dataset.text;
+                    if (textToConvert) {
+                        try {
+                            const audioBlob = await convertTextToAudio(textToConvert);
+                            downloadAudio(audioBlob, `story_${Date.now()}.mp3`);
+                        } catch (error) {
+                            console.error("Failed to download MP3:", error);
+                            showPromptMessage(`Failed to convert audio: ${error.message}`, '#storyOutput');
+                        }
+                    }
+                });
+                storyElement.querySelector('.delete-story-btn').addEventListener('click', () => {
+                    deleteStory(story.id);
+                });
+            });
+        };
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
             };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+        
+        const saveStory = async (storyText) => {
+            if (!userId) {
+                // Not authenticated, cannot save.
+                return;
+            }
+            if (!storyText.trim()) {
+                console.warn("Cannot save an empty story.");
+                return;
+            }
+            try {
+                await addDoc(getStoriesCollectionRef(), {
+                    text: storyText,
+                    timestamp: serverTimestamp(),
+                    userId: userId
+                });
+                console.log("Story saved successfully!");
+            } catch (error) {
+                console.error("Error saving story:", error);
+            }
+        };
+
+        const deleteStory = async (storyId) => {
+            if (!userId) {
+                console.warn("Not authenticated, cannot delete story.");
+                return;
+            }
+            try {
+                await deleteDoc(doc(db, `artifacts/${__app_id}/users/${userId}/my-stories`, storyId));
+                console.log("Story deleted successfully!");
+            } catch (error) {
+                console.error("Error deleting story:", error);
+            }
+        };
+        
+        // API Calls and UI Logic
+        const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
+        const API_KEY = ""; // Canvas will provide this at runtime
+
+        async function fetchWithRetry(url, options, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.status === 401) {
+                        throw new Error("Authentication Error: The API key is invalid or missing.");
+                    }
+                    if (!response.ok) {
+                        throw new Error(`API call failed with status ${response.status}`);
+                    }
+                    return response;
+                } catch (error) {
+                    if (i === retries - 1) {
+                        throw error;
+                    }
+                    const delay = Math.pow(2, i) * 1000;
+                    console.log(`Retrying API call in ${delay}ms...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+        
+        async function fetchGeminiAPI(model, payload, useJSON = false) {
+            const apiUrl = `${API_BASE_URL}${model}:generateContent?key=${API_KEY}`;
+            const headers = { 'Content-Type': 'application/json' };
             
             try {
-                const result = await fetchWithBackoff(state.baseLLMUrl + `?key=${state.apiKey}`, options);
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
                 const candidate = result.candidates?.[0];
-                if (candidate && candidate.content?.parts?.[0]?.text) {
-                    const text = candidate.content.parts[0].text;
-                    if (isStructured) {
-                        return JSON.parse(text);
+
+                if (!candidate || !candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+                    throw new Error('API response is empty or malformed.');
+                }
+                
+                const contentPart = candidate.content.parts[0];
+                
+                if (useJSON) {
+                    const jsonString = contentPart.text;
+                    if (!jsonString || jsonString.trim() === '') {
+                        throw new Error('No JSON content found in the response.');
+                    }
+                    try {
+                        return JSON.parse(jsonString);
+                    } catch (e) {
+                        throw new Error(`Failed to parse JSON: ${e.message}. Raw content: ${jsonString}`);
+                    }
+                } else {
+                    const text = contentPart.text;
+                    if (!text) {
+                        throw new Error('No text content found in the response.');
                     }
                     return text;
                 }
-                throw new Error('No content found in the API response.');
-            } catch (e) {
-                console.error('Error generating content:', e);
-                return null;
+            } catch (error) {
+                console.error("API Error:", error);
+                throw error;
             }
         }
-
-        // Handles the "Generate Prompt" button click
-        async function handleGeneratePrompt() {
-            setLoading(true, DOMElements.generatePromptBtn);
-            DOMElements.promptPlaceholder.textContent = 'Crafting your prompt...';
-            DOMElements.promptOutput.classList.add('fade-in');
-            
-            const keywords = DOMElements.keywords.value.trim();
-            const length = DOMElements.storyLength.value;
-            const audience = DOMElements.storyAudience.value;
-            const format = DOMElements.storyFormat.value;
-            const genre = DOMElements.storyGenre.value;
-
-            const systemPrompt = "You are a world-class prompt engineer. Your task is to turn a user's keywords into a detailed, creative, and compelling story prompt. The prompt should specify the setting, characters, and a central conflict. Do not write the story itself, just the prompt. The language should match the user's input.";
-            const userQuery = `Create a prompt for a ${length} story in the ${genre} genre, for an audience of ${audience}. The format should be a ${format}. The story must include the following keywords: ${keywords}.`;
-            
-            const prompt = await generateContent(systemPrompt, userQuery);
-            
-            if (prompt) {
-                DOMElements.promptOutput.textContent = prompt;
-                DOMElements.promptOutput.classList.remove('fade-in');
-            } else {
-                DOMElements.promptOutput.textContent = 'Failed to generate prompt. Please try again.';
-            }
-            setLoading(false, DOMElements.generatePromptBtn);
-        }
-
-        // Handles the "Write Story" button click
-        async function handleGenerateStory() {
-            setLoading(true, DOMElements.generateStoryBtn);
-            DOMElements.storyOutput.innerHTML = '';
-            DOMElements.storyLoadingMessage.classList.remove('hidden');
-            DOMElements.audioIconContainer.classList.add('hidden');
-            
-            const promptText = DOMElements.promptOutput.textContent.trim();
-            if (promptText === '' || promptText === DOMElements.promptPlaceholder.textContent) {
-                showMessage("Please generate a prompt first.", "error");
-                setLoading(false, DOMElements.generateStoryBtn);
-                DOMElements.storyLoadingMessage.classList.add('hidden');
+        
+        async function suggestIdeas() {
+            const keywords = keywordsInput.value.trim();
+            if (!keywords) {
+                showPromptMessage('Please enter some keywords first.', '#promptOutput');
                 return;
             }
 
-            const systemPrompt = "You are a master storyteller. Your task is to write a compelling story based on the provided prompt. The story should be well-structured with a clear beginning, middle, and end. The language and style should match the prompt's specifications.";
+            setLoading(suggestIdeasBtn, true);
+            suggestionOutput.innerHTML = '';
+            suggestionOutput.classList.add('hidden');
+
+            const storyLength = document.getElementById('storyLength').value;
+            const storyAudience = document.getElementById('storyAudience').value;
+            const storyFormat = document.getElementById('storyFormat').value;
+            const storyGenre = document.getElementById('storyGenre').value;
+            const storyLanguage = document.getElementById('storyLanguage').value;
             
-            const story = await generateContent(systemPrompt, promptText);
+            const prompt = `Generate 3 creative story ideas based on the following keywords: "${keywords}".
+            The story ideas should be for a ${storyAudience} audience, in the ${storyFormat} format, and in the ${storyGenre} genre, and should be written in ${storyLanguage}.
+            Respond only with a JSON array of objects. Each object should have a "title" and a "summary" key.`;
             
-            DOMElements.storyLoadingMessage.classList.add('hidden');
-            if (story) {
-                // Split the story into paragraphs and display them for potential highlighting
-                const paragraphs = story.split('\n\n');
-                DOMElements.storyOutput.innerHTML = '';
-                paragraphs.forEach((p, index) => {
-                    if (p.trim() !== '') {
-                        const pElement = document.createElement('p');
-                        pElement.textContent = p;
-                        pElement.classList.add('output-text');
-                        pElement.dataset.index = index;
-                        DOMElements.storyOutput.appendChild(pElement);
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                "title": { "type": "STRING" },
+                                "summary": { "type": "STRING" }
+                            }
+                        }
                     }
+                }
+            };
+            
+            try {
+                const ideas = await fetchGeminiAPI('gemini-2.5-flash-preview-05-20', payload, true);
+                suggestionOutput.classList.remove('hidden');
+                ideas.forEach((idea, index) => {
+                    const ideaDiv = document.createElement('div');
+                    ideaDiv.className = `p-4 rounded-xl bg-gray-600 cursor-pointer hover:bg-gray-500 transition-colors suggestion-item`;
+                    ideaDiv.style.animationDelay = `${index * 0.1}s`;
+                    ideaDiv.innerHTML = `
+                        <h4 class="font-bold text-gray-200">${idea.title}</h4>
+                        <p class="text-sm text-gray-300 mt-1">${idea.summary}</p>
+                    `;
+                    ideaDiv.addEventListener('click', () => {
+                        keywordsInput.value = idea.summary;
+                        suggestionOutput.classList.add('hidden');
+                        showPromptMessage('Summary copied to keywords. Now generate a prompt or story!', '#promptOutput');
+                    });
+                    suggestionOutput.appendChild(ideaDiv);
                 });
-                DOMElements.storyOutput.classList.add('fade-in');
-                DOMElements.audioIconContainer.classList.remove('hidden');
-            } else {
-                DOMElements.storyOutput.innerHTML = '<p class="text-gray-400 italic">Failed to generate story. Please try again.</p>';
+            } catch (error) {
+                showPromptMessage(`Error generating ideas: ${error.message}. Please try again.`, '#promptOutput');
+            } finally {
+                setLoading(suggestIdeasBtn, false);
             }
-            setLoading(false, DOMElements.generateStoryBtn);
+        }
+
+        async function generatePrompt() {
+            const keywords = keywordsInput.value.trim();
+            if (!keywords) {
+                showPromptMessage('Please enter some keywords first.', '#promptOutput');
+                return;
+            }
+
+            setLoading(generatePromptBtn, true);
+            const storyLength = document.getElementById('storyLength').value;
+            const storyAudience = document.getElementById('storyAudience').value;
+            const storyFormat = document.getElementById('storyFormat').value;
+            const storyGenre = document.getElementById('storyGenre').value;
+            const storyLanguage = document.getElementById('storyLanguage').value;
+            
+            const prompt = `Based on the keywords "${keywords}", generate a detailed, creative, and imaginative story prompt. The story should be ${storyLength} length, for a ${storyAudience} audience, in the ${storyFormat} format, and in the ${storyGenre} genre. The response must be written in ${storyLanguage}. The response should be a complete paragraph and should be ready to be used as a prompt for another AI.`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+            
+            try {
+                const generatedPrompt = await fetchGeminiAPI('gemini-2.5-flash-preview-05-20', payload);
+                promptOutput.innerHTML = `<p class="output-text fade-in">${generatedPrompt.replace(/\n/g, '<br>')}</p>`;
+                currentStoryText = "";
+                storyActions.classList.add('hidden');
+            } catch (error) {
+                showPromptMessage(`Error generating prompt: ${error.message}`, '#promptOutput');
+            } finally {
+                setLoading(generatePromptBtn, false);
+            }
         }
         
-        // Handles the "Suggest Ideas" button click
-        async function handleSuggestIdeas() {
-            setLoading(true, DOMElements.suggestIdeasBtn);
-            DOMElements.suggestionOutput.classList.add('hidden');
-            DOMElements.suggestionOutput.innerHTML = `<p class="text-center italic">Generating ideas...</p>`;
-
-            const keywords = DOMElements.keywords.value.trim();
-            const length = DOMElements.storyLength.value;
-            const audience = DOMElements.storyAudience.value;
-            const genre = DOMElements.storyGenre.value;
-
-            const systemPrompt = "You are a creative brain. Your task is to generate a list of 5 story ideas based on the user's input. The ideas should be a mix of creative prompts, but only provide the short, concise titles for the ideas in a JSON array format, e.g., ['Idea 1', 'Idea 2', 'Idea 3', 'Idea 4', 'Idea 5']. Do not include any other text or formatting. The ideas should be simple, single phrases.";
-            const userQuery = `Give me 5 story ideas for a ${length} story in the ${genre} genre, for an audience of ${audience}, using the keywords: ${keywords}.`;
-            
-            const ideas = await generateContent(systemPrompt, userQuery, true);
-
-            DOMElements.suggestionOutput.innerHTML = '';
-            if (ideas && Array.isArray(ideas)) {
-                DOMElements.suggestionOutput.classList.remove('hidden');
-                ideas.forEach((idea, index) => {
-                    const ideaButton = document.createElement('button');
-                    ideaButton.textContent = idea;
-                    ideaButton.classList.add('button-gradient', 'w-full', 'btn-suggest', 'suggestion-item');
-                    ideaButton.style.animationDelay = `${index * 0.1}s`;
-                    ideaButton.onclick = () => {
-                        DOMElements.keywords.value = idea;
-                        DOMElements.suggestionOutput.classList.add('hidden');
-                    };
-                    DOMElements.suggestionOutput.appendChild(ideaButton);
-                });
-            } else {
-                DOMElements.suggestionOutput.classList.remove('hidden');
-                DOMElements.suggestionOutput.innerHTML = '<p class="text-center italic text-gray-400">Could not generate suggestions. Try different keywords.</p>';
+        async function generateStory() {
+            const promptText = promptOutput.innerText.trim();
+            if (!promptText || promptOutput.children[0].id === 'promptPlaceholder') {
+                showPromptMessage('Please generate a prompt first.', '#storyOutput');
+                return;
             }
-            setLoading(false, DOMElements.suggestIdeasBtn);
+            
+            setLoading(generateStoryBtn, true);
+            setStoryLoading(true);
+            
+            storyOutput.innerHTML = '';
+            
+            // Get the selected length and language
+            const storyLengthKey = document.getElementById('storyLength').value;
+            const wordCount = WORD_COUNTS[storyLengthKey];
+            const storyLanguage = document.getElementById('storyLanguage').value;
+            
+            const storyGenerationPrompt = `Using the following prompt, write a story of approximately ${wordCount} words. The story must be in the ${storyLanguage} language. Prompt: "${promptText}"`;
+
+            const payload = {
+                contents: [{ parts: [{ text: storyGenerationPrompt }] }],
+            };
+            
+            try {
+                const fullText = await fetchGeminiAPI('gemini-2.5-flash-preview-05-20', payload);
+                
+                // Set the full text at once for robustness
+                storyOutput.innerHTML = `<p class="output-text">${fullText.replace(/\n/g, '<br>')}</p>`;
+                currentStoryText = fullText;
+                storyActions.classList.remove('hidden');
+            } catch (error) {
+                showPromptMessage(`Error writing story: ${error.message}`, '#storyOutput');
+                storyActions.classList.add('hidden');
+            } finally {
+                setLoading(generateStoryBtn, false);
+                setStoryLoading(false);
+            }
         }
+        
+        // General UI functions
+        const showPromptMessage = (message, targetSelector) => {
+            const target = document.querySelector(targetSelector);
+            target.innerHTML = `<p class="text-red-400 italic fade-in">${message}</p>`;
+            setTimeout(() => {
+                target.innerHTML = `<p class="text-gray-400 italic fade-in">${targetSelector === '#promptOutput' ? 'Your story prompt will appear here...' : 'Your complete story will appear here...'}</p>`;
+            }, 5000);
+        };
 
-        // === TTS (Text-to-Speech) Logic ===
+        const setLoading = (button, isLoading) => {
+            button.disabled = isLoading;
+            button.innerHTML = isLoading ? `<svg class="loading-spinner w-5 h-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>` : button.dataset.originalText;
+        };
 
-        // Helper function to convert base64 to ArrayBuffer
-        function base64ToArrayBuffer(base64) {
-            const binaryString = window.atob(base64);
+        const setStoryLoading = (isLoading) => {
+            if (isLoading) {
+                storyPlaceholder.classList.add('hidden');
+                storyLoadingOverlay.classList.remove('hidden');
+            } else {
+                storyLoadingOverlay.classList.add('hidden');
+                if (storyOutput.innerText.trim() === '') {
+                    storyPlaceholder.classList.remove('hidden');
+                }
+            }
+        };
+
+        // Page navigation logic
+        const navigate = (hash) => {
+            pages.forEach(page => page.classList.add('hidden'));
+            const targetPage = document.querySelector(hash);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === hash) {
+                    link.classList.add('active');
+                }
+            });
+        };
+
+        const handleHashChange = () => {
+            const hash = window.location.hash || '#home-page';
+            navigate(hash);
+        };
+
+        // TTS and Audio Conversion Functions
+        const pcmToWav = (pcmData, sampleRate) => {
+            const buffer = new ArrayBuffer(44 + pcmData.length * 2);
+            const view = new DataView(buffer);
+            
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + pcmData.length * 2, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true); // Mono
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, pcmData.length * 2, true);
+
+            let offset = 44;
+            for (let i = 0; i < pcmData.length; i++) {
+                view.setInt16(offset, pcmData[i], true);
+                offset += 2;
+            }
+            return new Blob([view], { type: 'audio/wav' });
+        };
+        
+        const writeString = (view, offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+
+        const base64ToArrayBuffer = (base64) => {
+            const binaryString = atob(base64);
             const len = binaryString.length;
             const bytes = new Uint8Array(len);
             for (let i = 0; i < len; i++) {
                 bytes[i] = binaryString.charCodeAt(i);
             }
             return bytes.buffer;
-        }
+        };
 
-        // Helper function to convert PCM to WAV format
-        function pcmToWav(pcm16, sampleRate) {
-            const numChannels = 1;
-            const bitsPerSample = 16;
-            const wavData = new ArrayBuffer(44 + pcm16.length * 2);
-            const view = new DataView(wavData);
-            const dataLength = pcm16.length * 2;
-            const buffer = new Int16Array(pcm16);
-
-            // RIFF chunk
-            writeString(view, 0, 'RIFF');
-            view.setUint32(4, 36 + dataLength, true);
-            writeString(view, 8, 'WAVE');
-
-            // fmt chunk
-            writeString(view, 12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true); // PCM format
-            view.setUint16(22, numChannels, true);
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * numChannels * (bitsPerSample / 8), true);
-            view.setUint16(32, numChannels * (bitsPerSample / 8), true);
-            view.setUint16(34, bitsPerSample, true);
-
-            // data chunk
-            writeString(view, 36, 'data');
-            view.setUint32(40, dataLength, true);
-
-            // Write PCM data
-            for (let i = 0; i < buffer.length; i++) {
-                view.setInt16(44 + i * 2, buffer[i], true);
+        const convertTextToAudio = async (textToConvert) => {
+            if (!textToConvert.trim()) {
+                throw new Error("No text to convert to audio.");
             }
 
-            return new Blob([view], { type: 'audio/wav' });
-        }
-
-        function writeString(view, offset, string) {
-            for (let i = 0; i < string.length; i++) {
-                view.setUint8(offset + i, string.charCodeAt(i));
-            }
-        }
-
-        async function getAudioFromText(text) {
-            DOMElements.playIcon.classList.add('hidden');
-            DOMElements.pauseIcon.classList.add('hidden');
-            DOMElements.loadingSpinner.classList.remove('hidden');
+            audioControlBtn.disabled = true;
+            audioButtonText.textContent = "Converting...";
+            downloadIcon.classList.add('hidden');
+            audioLoadingSpinner.classList.remove('hidden');
 
             const payload = {
-                contents: [{
-                    parts: [{ text: text }]
-                }],
+                contents: [{ parts: [{ text: textToConvert }] }],
                 generationConfig: {
                     responseModalities: ["AUDIO"],
                     speechConfig: {
                         voiceConfig: {
-                            prebuiltVoiceConfig: { voiceName: "Iapetus" }
+                            prebuiltVoiceConfig: { voiceName: "Kore" }
                         }
                     }
                 },
                 model: "gemini-2.5-flash-preview-tts"
             };
-            const options = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            };
-            
+
             try {
-                const result = await fetchWithBackoff(state.ttsLLMUrl + `?key=${state.apiKey}`, options);
+                const apiUrl = `${API_BASE_URL}gemini-2.5-flash-preview-tts:generateContent?key=${API_KEY}`;
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    const errorDetails = await response.text();
+                    throw new Error(`TTS API call failed: ${response.status} - ${errorDetails}`);
+                }
+
+                const result = await response.json();
                 const part = result?.candidates?.[0]?.content?.parts?.[0];
                 const audioData = part?.inlineData?.data;
                 const mimeType = part?.inlineData?.mimeType;
 
-                if (audioData && mimeType && mimeType.startsWith("audio/")) {
-                    const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)[1], 10);
-                    const pcmData = base64ToArrayBuffer(audioData);
-                    const pcm16 = new Int16Array(pcmData);
-                    const wavBlob = pcmToWav(pcm16, sampleRate);
-                    const audioUrl = URL.createObjectURL(wavBlob);
-                    
-                    state.currentAudioUrl = audioUrl;
-                    DOMElements.loadingSpinner.classList.add('hidden');
-                    DOMElements.playIcon.classList.remove('hidden');
-                    return audioUrl;
-                } else {
-                    throw new Error('Invalid audio data received.');
+                if (!audioData || !mimeType) {
+                    throw new Error("No audio data received in the API response.");
                 }
-            } catch (e) {
-                console.error("Error generating audio:", e);
-                showMessage("Failed to generate audio. Please try again.", "error");
-                DOMElements.loadingSpinner.classList.add('hidden');
-                DOMElements.playIcon.classList.remove('hidden');
-                return null;
-            }
-        }
-        
-        async function handlePlayAudio() {
-            const storyText = DOMElements.storyOutput.textContent.trim();
-            if (storyText === '' || storyText === DOMElements.storyPlaceholder.textContent) {
-                showMessage("There is no story to read.", "error");
-                return;
-            }
 
-            if (state.isPlaying) {
-                state.audioPlayer.pause();
-                state.isPlaying = false;
-                DOMElements.playIcon.classList.remove('hidden');
-                DOMElements.pauseIcon.classList.add('hidden');
-                if (state.highlightedParagraph) {
-                    state.highlightedParagraph.classList.remove('highlighted-line');
+                const sampleRateMatch = mimeType.match(/rate=(\d+)/);
+                if (!sampleRateMatch) {
+                    throw new Error("Could not find sample rate in MIME type.");
                 }
-                return;
-            }
+                const sampleRate = parseInt(sampleRateMatch[1], 10);
+                const pcmData = base64ToArrayBuffer(audioData);
+                const pcm16 = new Int16Array(pcmData);
+                
+                // Convert PCM to WAV
+                const wavBlob = pcmToWav(pcm16, sampleRate);
+                
+                // Reset UI state
+                audioControlBtn.disabled = false;
+                audioButtonText.textContent = "Download Audio (MP3)";
+                downloadIcon.classList.remove('hidden');
+                audioLoadingSpinner.classList.add('hidden');
 
-            if (!state.currentAudioUrl) {
-                const audioUrl = await getAudioFromText(storyText);
-                if (audioUrl) {
-                    state.audioPlayer.src = audioUrl;
-                } else {
-                    return;
-                }
-            }
-            
-            state.audioPlayer.play();
-            state.isPlaying = true;
-            DOMElements.playIcon.classList.add('hidden');
-            DOMElements.pauseIcon.classList.remove('hidden');
+                return wavBlob;
 
-            const paragraphs = Array.from(DOMElements.storyOutput.querySelectorAll('p.output-text'));
-            let currentParagraphIndex = 0;
-
-            state.audioPlayer.onplay = () => {
-                if (paragraphs.length > 0) {
-                    state.highlightedParagraph = paragraphs[0];
-                    state.highlightedParagraph.classList.add('highlighted-line');
-                }
-            };
-            
-            // Simple highlighting logic based on time
-            state.audioPlayer.ontimeupdate = () => {
-                if (state.audioPlayer.paused) return;
-
-                const elapsedTime = state.audioPlayer.currentTime;
-                const duration = state.audioPlayer.duration;
-                if (duration > 0) {
-                    const progress = elapsedTime / duration;
-                    const nextIndex = Math.floor(progress * paragraphs.length);
-                    if (nextIndex > currentParagraphIndex && nextIndex < paragraphs.length) {
-                        if (state.highlightedParagraph) {
-                            state.highlightedParagraph.classList.remove('highlighted-line');
-                        }
-                        currentParagraphIndex = nextIndex;
-                        state.highlightedParagraph = paragraphs[currentParagraphIndex];
-                        state.highlightedParagraph.classList.add('highlighted-line');
-                    }
-                }
-            };
-
-            state.audioPlayer.onended = () => {
-                state.isPlaying = false;
-                DOMElements.playIcon.classList.remove('hidden');
-                DOMElements.pauseIcon.classList.add('hidden');
-                if (state.highlightedParagraph) {
-                    state.highlightedParagraph.classList.remove('highlighted-line');
-                }
-            };
-        }
-
-        // === Event Listeners and UI Logic ===
-
-        // Page navigation handler
-        function navigateToPage(pageId) {
-            DOMElements.pages.forEach(page => {
-                page.classList.add('hidden');
-            });
-            document.getElementById(pageId).classList.remove('hidden');
-
-            DOMElements.navLinks.forEach(link => {
-                if (link.href.endsWith(pageId)) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Sticky header logic
-        let lastScrollY = window.scrollY;
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('.modern-nav');
-            if (lastScrollY < window.scrollY && window.scrollY > 100) {
-                header.classList.add('header-hidden');
-            } else {
-                header.classList.remove('header-hidden');
-            }
-            lastScrollY = window.scrollY;
-        });
-
-        // Category button click handler
-        DOMElements.categoryButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                DOMElements.categoryButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-
-                // Simulate loading for the category content
-                DOMElements.categoryLoadingOverlay.classList.remove('hidden');
-                setTimeout(() => {
-                    DOMElements.categoryLoadingOverlay.classList.add('hidden');
-                    const category = button.dataset.category;
-                    let placeholderText = '';
-                    switch (category) {
-                        case 'childrensStories':
-                            placeholderText = 'e.g., a friendly dragon, a lost toy, in Hindi';
-                            break;
-                        case 'poems':
-                            placeholderText = 'e.g., the stars at night, a quiet forest, a feeling of sadness, in Spanish';
-                            break;
-                        case 'riddles':
-                            placeholderText = 'e.g., no voice, but speaks to all, in Farsi';
-                            break;
-                        case 'jokes':
-                            placeholderText = 'e.g., a chicken crossing the road, a silly pun, in French';
-                            break;
-                        case 'poetry':
-                            placeholderText = 'e.g., a gentle breeze, forgotten memories, in Japanese';
-                            break;
-                        default:
-                            placeholderText = 'e.g., a magical lake, a small deer, in Urdu';
-                            break;
-                    }
-                    DOMElements.keywords.placeholder = placeholderText;
-                }, 1000);
-            });
-        });
-
-        // Contact form submission handler
-        DOMElements.contactForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const form = e.target;
-            const data = new FormData(form);
-            const statusMessage = DOMElements.contactMessageStatus;
-
-            try {
-                const response = await fetch(form.action, {
-                    method: form.method,
-                    body: data,
-                    headers: { 'Accept': 'application/json' }
-                });
-
-                if (response.ok) {
-                    form.reset();
-                    showMessage("Thanks for your message! We'll be in touch soon.", "success");
-                } else {
-                    const responseData = await response.json();
-                    if (responseData.errors) {
-                        throw new Error(responseData.errors.map(error => error.message).join(", "));
-                    } else {
-                        throw new Error("Form submission failed.");
-                    }
-                }
             } catch (error) {
-                console.error('Form submission error:', error);
-                showMessage("Oops! There was a problem with your submission.", "error");
+                audioControlBtn.disabled = false;
+                audioButtonText.textContent = "Download Audio (MP3)";
+                downloadIcon.classList.remove('hidden');
+                audioLoadingSpinner.classList.add('hidden');
+                throw error;
+            }
+        };
+
+        const downloadAudio = (blob, filename) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+        
+        // Event Listeners
+        window.addEventListener('load', () => {
+            initializeFirebase();
+            handleHashChange();
+        });
+        window.addEventListener('hashchange', handleHashChange);
+        
+        // Save original button texts
+        generatePromptBtn.dataset.originalText = generatePromptBtn.innerHTML;
+        generateStoryBtn.dataset.originalText = generateStoryBtn.innerHTML;
+        suggestIdeasBtn.dataset.originalText = suggestIdeasBtn.innerHTML;
+
+        generatePromptBtn.addEventListener('click', generatePrompt);
+        generateStoryBtn.addEventListener('click', generateStory);
+        suggestIdeasBtn.addEventListener('click', suggestIdeas);
+        saveStoryBtn.addEventListener('click', () => saveStory(currentStoryText));
+        
+        audioControlBtn.addEventListener('click', async () => {
+            if (currentStoryText.trim()) {
+                try {
+                    const audioBlob = await convertTextToAudio(currentStoryText);
+                    downloadAudio(audioBlob, `story_${Date.now()}.mp3`);
+                } catch (error) {
+                    showPromptMessage(`Failed to convert audio: ${error.message}`, '#storyOutput');
+                }
+            } else {
+                showPromptMessage('Please generate a story first.', '#storyOutput');
             }
         });
-
-        // Initial setup and event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            // Store original button text
-            DOMElements.generatePromptBtn.dataset.originalText = DOMElements.generatePromptBtn.innerHTML;
-            DOMElements.generateStoryBtn.dataset.originalText = DOMElements.generateStoryBtn.innerHTML;
-            DOMElements.suggestIdeasBtn.dataset.originalText = DOMElements.suggestIdeasBtn.innerHTML;
-
-            // Page navigation event listeners
-            DOMElements.navLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const pageId = link.getAttribute('href').substring(1);
-                    navigateToPage(pageId);
-                });
-            });
-
-            // Set initial active nav link
-            const initialPage = window.location.hash.substring(1) || 'home-page';
-            navigateToPage(initialPage);
-
-            // Button click handlers
-            DOMElements.generatePromptBtn.addEventListener('click', handleGeneratePrompt);
-            DOMElements.generateStoryBtn.addEventListener('click', handleGenerateStory);
-            DOMElements.suggestIdeasBtn.addEventListener('click', handleSuggestIdeas);
-
-            // Footer navigation
-            document.querySelector('footer').addEventListener('click', (e) => {
-                if (e.target.tagName === 'A' && e.target.getAttribute('href').startsWith('#')) {
-                    e.preventDefault();
-                    const pageId = e.target.getAttribute('href').substring(1);
-                    navigateToPage(pageId);
+        
+        // Category button logic
+        document.querySelectorAll('.category-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // You can add logic here to change story genre/audience based on category if needed
+                const category = btn.dataset.category;
+                if (category === 'childrensStories') {
+                    document.getElementById('storyAudience').value = 'children';
+                    document.getElementById('storyFormat').value = 'prose';
+                    document.getElementById('storyGenre').value = 'fantasy';
+                } else if (category === 'poems' || category === 'poetry') {
+                    document.getElementById('storyFormat').value = 'poem';
+                } else if (category === 'riddles') {
+                    document.getElementById('storyFormat').value = 'riddle';
+                } else if (category === 'jokes') {
+                    document.getElementById('storyFormat').value = 'joke';
+                } else {
+                    document.getElementById('storyAudience').value = 'general';
+                    document.getElementById('storyFormat').value = 'prose';
+                    document.getElementById('storyGenre').value = 'fantasy';
                 }
             });
         });
+
+        // User Auth forms
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = e.target.registerEmail.value;
+            const password = e.target.registerPassword.value;
+            const messageEl = document.getElementById('registerMessage');
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                messageEl.textContent = 'Registration successful! You can now log in.';
+                messageEl.style.color = '#10b981';
+            } catch (error) {
+                messageEl.textContent = `Error: ${error.message}`;
+                messageEl.style.color = '#ef4444';
+                console.error("Registration error:", error);
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = e.target.loginEmail.value;
+            const password = e.target.loginPassword.value;
+            const messageEl = document.getElementById('loginMessage');
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                messageEl.textContent = 'Login successful!';
+                messageEl.style.color = '#10b981';
+                window.location.hash = '#home-page';
+            } catch (error) {
+                messageEl.textContent = `Error: ${error.message}`;
+                messageEl.style.color = '#ef4444';
+                console.error("Login error:", error);
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                console.log("User logged out.");
+                window.location.hash = '#home-page';
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+        });
+        
+        // Copy to clipboard function
+        const copyText = (text) => {
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = text;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            console.log("Text copied to clipboard.");
+        };
 
     </script>
 </body>
