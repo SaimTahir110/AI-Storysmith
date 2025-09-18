@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Storysmith</title>
+    <title>StoryInk</title>
     <!-- Primary font for Latin-based languages -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Font for Urdu and other Arabic-script languages -->
@@ -13,23 +13,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            /* Use Inter for UI, and Noto Nastaliq Urdu for generated content. The browser will automatically pick the best font for the script. */
             font-family: 'Inter', 'Noto Nastaliq Urdu', sans-serif;
-            background-color: #1a202c; /* Deep slate background */
-            color: #e2e8f0; /* Light gray text */
+            background-color: #1a202c;
+            color: #e2e8f0;
         }
         .container {
-            /* Increased max-width to make the content and newsletter wider */
             max-width: 960px;
             padding: 1rem;
         }
         .header-card {
-            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%); /* Darker gradient */
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
             border-radius: 1.5rem;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
         }
         .card {
-            background-color: #2d3748; /* Darker card color */
+            background-color: #2d3748;
             border-radius: 1.5rem;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
@@ -58,7 +56,6 @@
             transform: none;
             box-shadow: none;
         }
-
         /* Specific button colors */
         .btn-prompt {
             --color-from: #3b82f6;
@@ -84,6 +81,14 @@
             --color-from: #f59e0b;
             --color-to: #d97706;
         }
+        .btn-outline {
+            --color-from: #f43f5e;
+            --color-to: #e11d48;
+        }
+        .btn-refine {
+            --color-from: #f59e0b;
+            --color-to: #d97706;
+        }
         .social-icon {
             font-size: 1.5rem;
             color: #93c5fd;
@@ -102,7 +107,6 @@
         .footer-link:hover {
             color: #3b82f6;
         }
-
         textarea {
             resize: none;
             scrollbar-width: none;
@@ -110,13 +114,11 @@
         textarea::-webkit-scrollbar {
             display: none;
         }
-        
         .output-text {
             font-size: 1.1rem;
             line-height: 1.8;
-            font-weight: 700; /* Made all output text bold */
+            font-weight: 700;
         }
-        
         /* Fade-in animation for outputs */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -125,7 +127,6 @@
         .fade-in {
             animation: fadeIn 0.5s ease-out forwards;
         }
-        
         /* New fade-in-up animation for suggestions */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -134,15 +135,13 @@
         .suggestion-item {
             animation: fadeInUp 0.5s ease-out forwards;
         }
-
         /* Highlighting for audio playback */
         .highlighted-word {
-            background-color: #4a5568; /* a darker slate-gray */
+            background-color: #4a5568;
             border-radius: 0.25rem;
             padding: 0.1rem 0.25rem;
             transition: background-color 0.1s ease-in-out;
         }
-        
         /* Modern audio button styles */
         .audio-icon-container {
             position: absolute;
@@ -176,25 +175,34 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        
         /* Active category button styling */
         .category-button.active {
             background: linear-gradient(45deg, #3b82f6, #60a5fa);
             color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-            border: none;
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+            transform: translateY(-3px) scale(1.05);
         }
         .category-button {
             border: 2px solid #4a5568;
             background-color: #2d3748;
-            transition: all 0.2s ease-in-out;
-            white-space: nowrap; /* Prevents wrapping */
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            white-space: nowrap;
+            position: relative;
+            z-index: 10;
+            animation: categoryFadeIn 0.5s ease-out forwards;
+            opacity: 0;
         }
         .category-button:hover:not(.active) {
-            transform: scale(1.05);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border-color: #38bdf8;
+            background-color: #374151;
         }
-        
+        @keyframes categoryFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         /* New CSS for the category loading overlay */
         .category-loading-overlay {
             position: absolute;
@@ -202,7 +210,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(26, 32, 44, 0.9); /* Darker overlay */
+            background-color: rgba(26, 32, 44, 0.9);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -211,7 +219,6 @@
             z-index: 20;
             transition: opacity 0.3s ease-in-out;
         }
-
         /* New loading screen animations */
         .loading-title {
             font-size: 2.5rem;
@@ -223,7 +230,6 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
-
         .loading-icon-container {
             display: flex;
             gap: 1.5rem;
@@ -234,54 +240,72 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-20px); }
         }
-
         /* New spinner for the category loading overlay */
         .category-spinner {
             width: 50px;
             height: 50px;
             border-radius: 50%;
             border: 5px solid #4a5568;
-            border-top-color: #60a5fa; /* Lighter spinner color */
+            border-top-color: #60a5fa;
             animation: spin 1s linear infinite;
         }
-
         /* Modern header navigation styles */
         .modern-nav {
-            background-color: #2d3748;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease-in-out;
+            background-color: rgba(26, 32, 44, 0.7); /* Semi-transparent background */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(74, 85, 104, 0.4);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smoother easing */
             z-index: 50;
+            padding: 1rem 0;
         }
-
         .header-hidden {
             transform: translateY(-100%);
         }
-
         .nav-link {
-            color: #e2e8f0;
+            color: #a0aec0;
             font-weight: 500;
-            padding: 0.75rem 1.25rem;
+            padding: 0.5rem 1rem;
             border-radius: 9999px;
             transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
         }
-
+        /* New classic hover effect */
         .nav-link:hover {
-            background-color: #4a5568;
-            color: #fff;
+            color: #ffffff;
+            background-color: transparent;
         }
-
+        .nav-link:hover::after, .nav-link.active::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 80%;
+            height: 2px;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #38bdf8, #818cf8, #a78bfa);
+            border-radius: 2px;
+        }
         .nav-link.active {
-            background: linear-gradient(45deg, #3b82f6, #60a5fa);
             color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-            transform: scale(1.05);
+            background-color: transparent;
+            font-weight: 700;
         }
-
+        /* Classic divider line for the logo section */
+        .logo-divider {
+            height: 20px;
+            width: 1px;
+            background-color: #4a5568;
+            margin: 0 1.5rem;
+        }
         /* Content page styles */
         .page {
             animation: fadeIn 0.5s ease-out forwards;
         }
-
         .page-content {
             background-color: #2d3748;
             padding: 2rem;
@@ -289,11 +313,9 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             min-height: 400px;
         }
-
         .hidden {
             display: none;
         }
-        
         /* New styles for the scrollable category area */
         .category-list-container {
             -webkit-overflow-scrolling: touch;
@@ -301,25 +323,125 @@
             overflow-x: auto;
             scrollbar-width: none;
         }
-
         .category-list-container::-webkit-scrollbar {
             display: none;
+        }
+        /* New styles for saved stories cards */
+        .story-card {
+            background-color: #2d3748;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .story-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        .story-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #4a5568;
+        }
+        .story-card-content {
+            max-height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+        .story-card-content::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(to bottom, transparent, #2d3748);
+        }
+        .story-card-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .story-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        /* New styles for custom dropdowns */
+        .styled-select-wrapper {
+            position: relative;
+            width: 100%;
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        .styled-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 100%;
+            padding: 0.75rem 2.5rem 0.75rem 1rem;
+            background-color: #2d3748;
+            border: 2px solid #4a5568;
+            border-radius: 0.75rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='%239ca3af' %3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.2em;
+        }
+        .styled-select:hover {
+            border-color: #38bdf8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .styled-select:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.4);
+        }
+        /* New Modern Footer styles */
+        .modern-footer {
+            background-color: rgba(26, 32, 44, 0.7); /* Semi-transparent background */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(74, 85, 104, 0.4);
+            box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .footer-link:hover {
+            color: #60a5fa;
+            text-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+        }
+        .social-icon:hover {
+            color: #60a5fa;
+            transform: scale(1.1) translateY(-2px);
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.6);
         }
     </style>
 </head>
 <body class="flex flex-col items-center min-h-screen">
-    
     <!-- Modern Navigation Header -->
     <header class="w-full modern-nav fixed top-0 py-1">
         <div class="container mx-auto flex flex-col md:flex-row items-center justify-between">
-            <h1 class="text-lg md:text-xl font-bold gradient-text mb-1 md:mb-0">AI Storysmith</h1>
-            <nav>
+            <div class="flex items-center">
+                <div class="w-10 h-10 mr-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">SI</div>
+                <h1 class="text-lg md:text-xl font-bold gradient-text">StoryInk</h1>
+                <!-- Classic divider line -->
+                <div class="logo-divider hidden md:block"></div>
+            </div>
+            <nav class="mt-4 md:mt-0">
                 <ul class="flex space-x-2 md:space-x-4">
-                    <li><a href="#home-page" class="nav-link" id="nav-home">Home</a></li>
+                    <li><a href="#home-page" class="nav-link active" id="nav-home">Home</a></li>
                     <li><a href="#about-us-page" class="nav-link" id="nav-about">About Us</a></li>
                     <li><a href="#blog-page" class="nav-link" id="nav-blog">Blog</a></li>
                     <li><a href="#contact-us-page" class="nav-link" id="nav-contact">Contact Us</a></li>
-                    <li id="myStoriesNav" class="hidden"><a href="#my-stories-page" class="nav-link" id="nav-my-stories">My Stories</a></li>
+                    <li id="myStoriesNav" class="hidden"><a href="#my-stories-page" class="nav-link" id="nav-my-stories"><i class="fas fa-bookmark"></i> <span class="hidden md:inline">My Stories</span></a></li>
                     <li id="loginNav"><a href="#login-page" class="nav-link" id="nav-login">Login</a></li>
                     <li id="registerNav" class="hidden"><a href="#register-page" class="nav-link" id="nav-register">Register</a></li>
                     <li id="logoutNav" class="hidden"><button id="logoutBtn" class="nav-link">Logout</button></li>
@@ -330,7 +452,6 @@
 
     <!-- Main Content Pages -->
     <div class="container mx-auto mt-16 md:mt-20 p-4 md:p-8 space-y-8">
-        
         <!-- Home Page Content (Existing Content) -->
         <div id="home-page" class="page">
             <header class="header-card text-center p-8 mb-8">
@@ -365,68 +486,81 @@
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
                         <div>
                             <label for="storyLanguage" class="block text-sm font-medium text-gray-400 mb-1">Language</label>
-                            <select id="storyLanguage" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="en-US">English</option>
-                                <option value="ur-PK">Urdu</option>
-                                <option value="ar-EG">Arabic</option>
-                                <option value="de-DE">German</option>
-                                <option value="es-US">Spanish</option>
-                                <option value="fr-FR">French</option>
-                                <option value="hi-IN">Hindi</option>
-                                <option value="ja-JP">Japanese</option>
-                                <option value="ko-KR">Korean</option>
-                                <option value="pt-BR">Portuguese</option>
-                                <option value="ru-RU">Russian</option>
-                                <option value="zh-CN">Chinese</option>
-                            </select>
+                            <div class="styled-select-wrapper">
+                                <select id="storyLanguage" class="styled-select">
+                                    <option value="en-US">English</option>
+                                    <option value="ur-PK">Urdu</option>
+                                    <option value="ar-EG">Arabic</option>
+                                    <option value="de-DE">German</option>
+                                    <option value="es-US">Spanish</option>
+                                    <option value="fr-FR">French</option>
+                                    <option value="hi-IN">Hindi</option>
+                                    <option value="ja-JP">Japanese</option>
+                                    <option value="ko-KR">Korean</option>
+                                    <option value="pt-BR">Portuguese</option>
+                                    <option value="ru-RU">Russian</option>
+                                    <option value="zh-CN">Chinese</option>
+                                </select>
+                            </div>
                         </div>
                         <div>
                             <label for="storyLength" class="block text-sm font-medium text-gray-400 mb-1">Length</label>
-                            <select id="storyLength" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="short">Short (approx. 300 words)</option>
-                                <option value="medium">Medium (approx. 600 words)</option>
-                                <option value="long">Long (approx. 1000 words)</option>
-                            </select>
+                            <div class="styled-select-wrapper">
+                                <select id="storyLength" class="styled-select">
+                                    <option value="short">Short (approx. 300 words)</option>
+                                    <option value="medium">Medium (approx. 600 words)</option>
+                                    <option value="long">Long (approx. 1000 words)</option>
+                                </select>
+                            </div>
                         </div>
                         <div>
                             <label for="storyAudience" class="block text-sm font-medium text-gray-400 mb-1">Audience</label>
-                            <select id="storyAudience" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="general">General</option>
-                                <option value="children">Children</option>
-                                <option value="teens">Teens</option>
-                                <option value="adults">Adults</option>
-                            </select>
+                            <div class="styled-select-wrapper">
+                                <select id="storyAudience" class="styled-select">
+                                    <option value="general">General</option>
+                                    <option value="children">Children</option>
+                                    <option value="teens">Teens</option>
+                                    <option value="adults">Adults</option>
+                                </select>
+                            </div>
                         </div>
                         <div>
                             <label for="storyFormat" class="block text-sm font-medium text-gray-400 mb-1">Format</label>
-                            <select id="storyFormat" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="prose">Prose</option>
-                                <option value="poem">Poem</option>
-                                <option value="script">Script</option>
-                                <option value="short story">Short Story</option>
-                                <option value="flash fiction">Flash Fiction</option>
-                                <option value="novella">Novella</option>
-                                <option value="screenplay">Screenplay</option>
-                                <option value="letter">Letter</option>
-                                <option value="journal entry">Journal Entry</option>
-                                <option value="article">Article</option>
-                            </select>
+                            <div class="styled-select-wrapper">
+                                <select id="storyFormat" class="styled-select">
+                                    <option value="prose">Prose</option>
+                                    <option value="short story">Short Story</option>
+                                    <option value="riddle">Riddle</option>
+                                    <option value="joke">Joke</option>
+                                    <option value="poetry">Poetry</option>
+                                    <option value="poem">Poem</option>
+                                    <option value="script">Script</option>
+                                    <option value="flash fiction">Flash Fiction</option>
+                                    <option value="novella">Novella</option>
+                                    <option value="screenplay">Screenplay</option>
+                                    <option value="letter">Letter</option>
+                                    <option value="journal entry">Journal Entry</option>
+                                    <option value="article">Article</option>
+                                </select>
+                            </div>
                         </div>
                         <div>
                             <label for="storyGenre" class="block text-sm font-medium text-gray-400 mb-1">Genre</label>
-                            <select id="storyGenre" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="fantasy">Fantasy</option>
-                                <option value="sci-fi">Sci-Fi</option>
-                                <option value="mystery">Mystery</option>
-                                <option value="romance">Romance</option>
-                                <option value="horror">Horror</option>
-                                <option value="comedy">Comedy</option>
-                                <option value="thriller">Thriller</option>
-                                <option value="historical fiction">Historical Fiction</option>
-                                <option value="dystopian">Dystopian</option>
-                                <option value="adventure">Adventure</option>
-                                <option value="young adult">Young Adult</option>
-                            </select>
+                            <div class="styled-select-wrapper">
+                                <select id="storyGenre" class="styled-select">
+                                    <option value="fantasy">Fantasy</option>
+                                    <option value="sci-fi">Sci-Fi</option>
+                                    <option value="mystery">Mystery</option>
+                                    <option value="romance">Romance</option>
+                                    <option value="horror">Horror</option>
+                                    <option value="comedy">Comedy</option>
+                                    <option value="thriller">Thriller</option>
+                                    <option value="historical fiction">Historical Fiction</option>
+                                    <option value="dystopian">Dystopian</option>
+                                    <option value="adventure">Adventure</option>
+                                    <option value="young adult">Young Adult</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
@@ -469,7 +603,10 @@
                     </div>
                     
                     <!-- Separate buttons for save and audio playback -->
-                    <div id="storyActions" class="flex space-x-4 justify-end mt-4 hidden">
+                    <div id="storyActions" class="flex flex-wrap space-x-2 space-y-2 sm:space-y-0 justify-end mt-4 hidden">
+                         <button id="refineStoryBtn" class="button-gradient btn-refine">
+                            ✨Refine Story✨
+                        </button>
                         <button id="saveStoryBtn" class="button-gradient btn-save">
                             Save Story
                         </button>
@@ -519,9 +656,9 @@
         <div id="my-stories-page" class="page hidden">
             <div class="page-content">
                 <h2 class="text-3xl font-bold gradient-text mb-4">My Stories</h2>
-                <p class="text-gray-400 mb-6">Your unique user ID: <span id="userIdDisplay" class="font-bold text-blue-300"></span></p>
-                <div id="storiesList" class="space-y-8">
-                    <p class="text-gray-400 italic text-center" id="storiesPlaceholder">You have no stories saved yet.</p>
+                <p class="text-gray-400 mb-6">Your unique user ID: <span id="userIdDisplay" class="font-bold text-blue-300">guest-1234</span></p>
+                <div id="storiesList" class="story-grid">
+                    <p class="text-gray-400 italic text-center col-span-full" id="storiesPlaceholder">You have no stories saved yet.</p>
                     <!-- Saved stories will be dynamically added here -->
                 </div>
             </div>
@@ -530,20 +667,20 @@
         <!-- About Us Page -->
         <div id="about-us-page" class="page hidden">
             <div class="page-content">
-                <h2 class="text-3xl font-bold gradient-text mb-4">About AI Storysmith</h2>
-                <p class="text-gray-300 mb-4">AI Storysmith is more than just a tool; it’s a creative companion designed to help you unlock your imagination. We believe that everyone has a story to tell, and our mission is to make the process of bringing those ideas to life as effortless and inspiring as possible. Our platform empowers writers of all levels—from seasoned authors seeking a fresh perspective to first-time storytellers taking their initial steps—by providing a seamless bridge between a simple idea and a completed narrative.</p>
+                <h2 class="text-3xl font-bold gradient-text mb-4">About StoryInk</h2>
+                <p class="text-gray-300 mb-4">StoryInk is more than just a tool; it's a creative companion designed to help you unlock your imagination. We believe that everyone has a story to tell, and our mission is to make the process of bringing those ideas to life as effortless and inspiring as possible.</p>
 
                 <h2 class="text-3xl font-bold gradient-text mb-4 mt-8">Our Mission</h2>
-                <p class="text-gray-300 mb-4">Our primary mission is to break down the barriers to creative expression. We understand that writer's block, a blank page, or a lack of inspiration can be daunting. By leveraging cutting-edge AI technology, we provide an intuitive space where you can generate prompts, explore new genres, and craft compelling stories in any language. We are committed to fostering a vibrant community where creativity knows no bounds.</p>
+                <p class="text-gray-300 mb-4">Our primary mission is to break down the barriers to creative expression. We understand that writer's block, a blank page, or a lack of inspiration can be daunting. By leveraging cutting-edge AI technology, we provide an intuitive space where you can generate prompts, explore new genres, and craft compelling stories in any language.</p>
 
                 <h2 class="text-3xl font-bold gradient-text mb-4 mt-8">The Technology Behind the Magic</h2>
-                <p class="text-gray-300 mb-4">Our AI models are built on a foundation of extensive literary and narrative data, allowing them to understand context, tone, and structure. This advanced technology enables us to transform your keywords and ideas into coherent and engaging stories. Our system is continuously learning, ensuring that it remains a powerful and versatile resource for all your creative endeavors.</p>
+                <p class="text-gray-300 mb-4">Our AI models are built on a foundation of extensive literary and narrative data, allowing them to understand context, tone, and structure. This advanced technology enables us to transform your keywords and ideas into coherent and engaging stories.</p>
 
                 <h2 class="text-3xl font-bold gradient-text mb-4 mt-8">Who We Are</h2>
-                <p class="text-gray-300 mb-4">We are a passionate team of developers, writers, and innovators dedicated to the art of storytelling. Our shared goal is to build a platform that not only simplifies the writing process but also ignites a love for creation. We are constantly listening to our users and evolving the platform to meet the needs of the modern storyteller.</p>
+                <p class="text-gray-300 mb-4">We are a passionate team of developers, writers, and innovators dedicated to the art of storytelling. Our shared goal is to build a platform that not only simplifies the writing process but also ignites a love for creation.</p>
 
                 <h2 class="text-3xl font-bold gradient-text mb-4 mt-8">Join the Journey</h2>
-                <p class="text-gray-300">We invite you to start your creative journey with us. Whether you're looking to pen a short story, craft a poem, or simply find a spark of inspiration, AI Storysmith is here to help you turn your ideas into reality. Thank you for being a part of our story.</p>
+                <p class="text-gray-300">We invite you to start your creative journey with us. Whether you're looking to pen a short story, craft a poem, or simply find a spark of inspiration, StoryInk is here to help you turn your ideas into reality.</p>
             </div>
         </div>
 
@@ -555,7 +692,7 @@
                     <article class="card p-6">
                         <h3 class="text-xl font-bold text-gray-200 mb-2">Tips for Using AI to Spark Creativity</h3>
                         <p class="text-gray-400 text-sm mb-4">Published on September 15, 2025</p>
-                        <p class="text-gray-300">Discover how to use AI tools like AI Storysmith to brainstorm new ideas, develop characters, and structure your plots. We share our top five tips to help you get the most out of your creative companion.</p>
+                        <p class="text-gray-300">Discover how to use AI tools like StoryInk to brainstorm new ideas, develop characters, and structure your plots. We share our top five tips to help you get the most out of your creative companion.</p>
                     </article>
                     <article class="card p-6">
                         <h3 class="text-xl font-bold text-gray-200 mb-2">The Future of AI in Storytelling</h3>
@@ -571,25 +708,16 @@
             <div class="page-content">
                 <h2 class="text-3xl font-bold gradient-text mb-4">Get in Touch</h2>
                 <p class="text-gray-300 mb-6" id="contact-message-status">We'd love to hear from you! Whether you have feedback, a question, or a feature request, please fill out the form below and we'll get back to you as soon as possible.</p>
-                <!-- 
-                    IMPORTANT: To make this form work, you must replace the placeholder URL
-                    below with your unique Formspree endpoint. See the instructions above!
-                -->
-                <!-- modify this form HTML and place wherever you want your form -->
-                <form id="contactForm"
-                  action="https://formspree.io/f/xnnbyywz"
-                  method="POST"
-                >
-                  <label>
-                    Your email:
-                    <input type="email" name="email" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  </label>
-                  <label class="block mt-4">
-                    Your message:
-                    <textarea name="message" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                  </label>
-                  <!-- your other form fields go here -->
-                  <button type="submit" class="w-full button-gradient btn-prompt mt-4">Send</button>
+                <form id="contactForm" class="space-y-4">
+                    <div>
+                        <label for="contactEmail" class="block text-sm font-medium text-gray-400 mb-1">Your email:</label>
+                        <input type="email" id="contactEmail" name="email" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="contactMessage" class="block text-sm font-medium text-gray-400 mb-1">Your message:</label>
+                        <textarea id="contactMessage" name="message" rows="5" class="w-full p-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    <button type="submit" class="w-full button-gradient btn-prompt mt-4">Send</button>
                 </form>
             </div>
         </div>
@@ -598,22 +726,9 @@
         <div id="privacy-policy-page" class="page hidden">
             <div class="page-content">
                 <h2 class="text-3xl font-bold gradient-text mb-4">Privacy Policy</h2>
-                <p class="text-gray-300 mb-4">Your privacy is important to us. This policy outlines how we collect, use, and protect your information when you use AI Storysmith. We are committed to ensuring the security of your data.</p>
+                <p class="text-gray-300 mb-4">Your privacy is important to us. This policy outlines how we collect, use, and protect your information when you use StoryInk. We are committed to ensuring the security of your data.</p>
                 <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Information We Collect</h3>
-                <p class="text-gray-300 mb-4">We collect information that you voluntarily provide when you use our services, such as the keywords and language you enter to generate stories. This data is used solely to provide and improve our services to you. We do not sell or share your personal information with third parties.</p>
-                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">How We Use Your Information</h3>
-                <p class="text-gray-300 mb-4">The information you provide is used to:
-                    <ul>
-                        <li>Generate and provide the requested stories and prompts.</li>
-                        <li>Personalize your experience and save your stories if you choose to.</li>
-                        <li>Analyze usage patterns to improve our service offerings.</li>
-                    </ul>
-                </p>
-                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Data Security</h3>
-                <p class="text-gray-300 mb-4">We employ industry-standard security measures to protect your information from unauthorized access, alteration, disclosure, or destruction. We use Firebase for user authentication and Firestore for data storage, which provides a secure and reliable infrastructure.</p>
-                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">Changes to This Policy</h3>
-                <p class="text-gray-300 mb-4">We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page. You are advised to review this policy periodically for any changes.
-                </p>
+                <p class="text-gray-300 mb-4">We collect information that you voluntarily provide when you use our services, such as the keywords and language you enter to generate stories. This data is used solely to provide and improve our services to you.</p>
             </div>
         </div>
 
@@ -621,41 +736,35 @@
         <div id="terms-of-service-page" class="page hidden">
             <div class="page-content">
                 <h2 class="text-3xl font-bold gradient-text mb-4">Terms of Service</h2>
-                <p class="text-gray-300 mb-4">Welcome to AI Storysmith! These terms and conditions outline the rules and regulations for the use of our website and services.</p>
+                <p class="text-gray-300 mb-4">Welcome to StoryInk! These terms and conditions outline the rules and regulations for the use of our website and services.</p>
                 <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">1. Acceptance of Terms</h3>
                 <p class="text-gray-300 mb-4">By accessing this website, you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access the service.</p>
-                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">2. Use of Service</h3>
-                <p class="text-gray-300 mb-4">AI Storysmith provides a tool for generating creative content. You are responsible for all content you generate and for your use of the service. You agree not to use the service for any illegal or unauthorized purpose.</p>
-                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">3. Intellectual Property</h3>
-                <p class="text-gray-300 mb-4">The content generated by our AI is for your personal, non-commercial use. While we provide the tool, you are the author of the final work and are free to use it as you see fit.</p>
-                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">4. Disclaimers</h3>
-                <p class="text-gray-300 mb-4">The service is provided on an "as is" and "as available" basis without any warranties, expressed or implied. We do not guarantee that the service will be uninterrupted, secure, or free from errors.</p>
-                <h3 class="text-2xl font-bold text-gray-200 mt-8 mb-2">5. Limitation of Liability</h3>
-                <p class="text-gray-300 mb-4">In no event shall AI Storysmith or its suppliers be liable for any damages arising out of the use or inability to use the materials on our website.</p>
             </div>
         </div>
-        
     </div>
 
     <!-- Footer -->
-    <footer class="w-full bg-gray-800 text-gray-400 py-6 mt-auto">
+    <footer class="w-full modern-footer text-gray-400 py-6 mt-auto">
         <div class="container mx-auto text-center flex flex-col sm:flex-row items-center justify-between px-4 sm:px-0">
-            <p class="text-sm">&copy; 2025 AI Storysmith. All Rights Reserved.</p>
-            <div class="flex space-x-6 mt-4 sm:mt-0">
+            <p class="text-sm">&copy; 2025 StoryInk. All Rights Reserved.</p>
+            <div class="flex items-center space-x-6 mt-4 sm:mt-0">
                 <a href="#privacy-policy-page" class="footer-link">Privacy Policy</a>
                 <a href="#terms-of-service-page" class="footer-link">Terms of Service</a>
-                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
-                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <div class="flex space-x-4">
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                </div>
             </div>
         </div>
     </footer>
 
+    
     <!-- Firebase SDK Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, getDocs, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, addDoc, deleteDoc, onSnapshot, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // --- Globals & Initializations ---
         let app;
@@ -663,6 +772,7 @@
         let auth;
         let userId = null;
         let currentStoryText = "";
+        let appId = 'default-app-id';
         
         const WORD_COUNTS = {
             'short': 300,
@@ -689,6 +799,7 @@
         const promptPlaceholder = document.getElementById('promptPlaceholder');
         const suggestionOutput = document.getElementById('suggestionOutput');
         const saveStoryBtn = document.getElementById('saveStoryBtn');
+        const refineStoryBtn = document.getElementById('refineStoryBtn');
         const storiesList = document.getElementById('storiesList');
         const storiesPlaceholder = document.getElementById('storiesPlaceholder');
         const storyActions = document.getElementById('storyActions');
@@ -696,11 +807,14 @@
         const audioButtonText = document.getElementById('audioButtonText');
         const downloadIcon = document.getElementById('downloadIcon');
         const audioLoadingSpinner = document.getElementById('audioLoadingSpinner');
+        const header = document.querySelector('header.modern-nav');
+        let lastScrollTop = 0;
         
         // Authentication and Firestore Setup
         const initializeFirebase = async () => {
             const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
             const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
             
             if (firebaseConfig) {
                 app = initializeApp(firebaseConfig);
@@ -733,7 +847,7 @@
                         }
                         updateAuthUI(false);
                         // Do not listen to stories if no user is signed in
-                        storiesList.innerHTML = '<p class="text-gray-400 italic text-center" id="storiesPlaceholder">Sign in to save and view your stories.</p>';
+                        storiesList.innerHTML = '<p class="text-gray-400 italic text-center col-span-full" id="storiesPlaceholder">Sign in to save and view your stories.</p>';
                     }
                 });
             } else {
@@ -760,7 +874,6 @@
 
         // Story management with Firestore
         const getStoriesCollectionRef = () => {
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
             // Ensure userId is not null before creating the path
             if (!userId) {
                 console.error("Cannot get stories collection: userId is null.");
@@ -789,20 +902,25 @@
         const renderStories = (stories) => {
             storiesList.innerHTML = '';
             if (stories.length === 0) {
-                storiesPlaceholder.classList.remove('hidden');
+                storiesList.innerHTML = '<p class="text-gray-400 italic text-center col-span-full" id="storiesPlaceholder">You have no stories saved yet.</p>';
                 return;
             }
-            storiesPlaceholder.classList.add('hidden');
+            
             stories.forEach(story => {
                 const formattedDate = story.timestamp?.seconds ? new Date(story.timestamp.seconds * 1000).toLocaleString() : 'N/A';
                 const storyElement = document.createElement('div');
-                storyElement.className = 'card p-6 rounded-xl flex flex-col space-y-4';
+                storyElement.className = 'story-card';
                 storyElement.innerHTML = `
-                    <p class="text-sm text-gray-400">Saved: ${formattedDate}</p>
-                    <div class="output-text">${story.text.replace(/\n/g, '<br>')}</div>
-                    <div class="flex justify-end space-x-2">
+                    <div class="story-card-header">
+                        <span class="text-sm text-gray-400">${formattedDate}</span>
+                        <span class="text-xs px-2 py-1 rounded-full bg-blue-900 text-blue-200">${story.category || 'General'}</span>
+                    </div>
+                    <div class="story-card-content">
+                        <p class="output-text">${story.text.replace(/\n/g, '<br>')}</p>
+                    </div>
+                    <div class="story-card-actions">
                         <button class="button-gradient btn-prompt text-xs p-2 copy-story-btn">Copy</button>
-                        <button class="button-gradient btn-story text-xs p-2 download-mp3-btn" data-text="${escapeHtml(story.text)}">Download Audio (MP3)</button>
+                        <button class="button-gradient btn-story text-xs p-2 download-mp3-btn" data-text="${escapeHtml(story.text)}">Audio</button>
                         <button class="button-gradient btn-save text-xs p-2 delete-story-btn">Delete</button>
                     </div>
                 `;
@@ -849,11 +967,16 @@
                 console.warn("Cannot save an empty story.");
                 return;
             }
+            
+            // Get the current category
+            const activeCategory = document.querySelector('.category-button.active').dataset.category;
+            
             try {
                 await addDoc(getStoriesCollectionRef(), {
                     text: storyText,
                     timestamp: serverTimestamp(),
-                    userId: userId
+                    userId: userId,
+                    category: activeCategory
                 });
                 console.log("Story saved successfully!");
             } catch (error) {
@@ -867,7 +990,7 @@
                 return;
             }
             try {
-                await deleteDoc(doc(db, `artifacts/${__app_id}/users/${userId}/my-stories`, storyId));
+                await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/my-stories`, storyId));
                 console.log("Story deleted successfully!");
             } catch (error) {
                 console.error("Error deleting story:", error);
@@ -876,7 +999,7 @@
         
         // API Calls and UI Logic
         const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
-        const API_KEY = ""; // Canvas will provide this at runtime
+        const apiKey = "AIzaSyDfwJ1hjCRjIeZZClvhXnQKonrgwYJr5zc"; 
 
         async function fetchWithRetry(url, options, retries = 3) {
             for (let i = 0; i < retries; i++) {
@@ -901,7 +1024,7 @@
         }
         
         async function fetchGeminiAPI(model, payload, useJSON = false) {
-            const apiUrl = `${API_BASE_URL}${model}:generateContent?key=${API_KEY}`;
+            const apiUrl = `${API_BASE_URL}${model}:generateContent?key=${apiKey}`;
             const headers = { 'Content-Type': 'application/json' };
             
             try {
@@ -943,6 +1066,69 @@
             }
         }
         
+        async function generateCategoryIdeas(category) {
+            const categoryPrompts = {
+                general: "general creative stories",
+                childrensStories: "engaging children's stories",
+                poems: "beautiful and evocative poems",
+                riddles: "clever and challenging riddles",
+                jokes: "funny and light-hearted jokes",
+                poetry: "deep and meaningful poetry"
+            };
+
+            const promptText = categoryPrompts[category] || "general creative stories";
+
+            // Show loading state and clear old content
+            suggestionOutput.innerHTML = `<div class="flex justify-center items-center p-4"><div class="category-spinner"></div></div>`;
+            suggestionOutput.classList.remove('hidden');
+            keywordsInput.value = ''; // Clear keywords
+            promptOutput.innerHTML = `<p id="promptPlaceholder" class="text-gray-400 italic">Your story prompt will appear here...</p>`;
+            storyOutput.innerHTML = `<p id="storyPlaceholder" class="text-gray-400 italic">Your complete story will appear here...</p>`;
+            storyActions.classList.add('hidden');
+
+
+            const prompt = `Generate 3 creative story ideas for ${promptText}. Respond only with a JSON array of objects. Each object should have a "title" and a "summary" key.`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                "title": { "type": "STRING" },
+                                "summary": { "type": "STRING" }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            try {
+                const ideas = await fetchGeminiAPI('gemini-2.5-flash-preview-05-20', payload, true);
+                suggestionOutput.innerHTML = ''; // Clear loading spinner
+                ideas.forEach((idea, index) => {
+                    const ideaDiv = document.createElement('div');
+                    ideaDiv.className = `p-4 rounded-xl bg-gray-600 cursor-pointer hover:bg-gray-500 transition-colors suggestion-item`;
+                    ideaDiv.style.animationDelay = `${index * 0.1}s`;
+                    ideaDiv.innerHTML = `
+                        <h4 class="font-bold text-gray-200">${idea.title}</h4>
+                        <p class="text-sm text-gray-300 mt-1">${idea.summary}</p>
+                    `;
+                    ideaDiv.addEventListener('click', () => {
+                        keywordsInput.value = idea.summary;
+                        suggestionOutput.classList.add('hidden');
+                        showPromptMessage('Idea copied to keywords. Now generate a prompt or story!', '#promptOutput');
+                    });
+                    suggestionOutput.appendChild(ideaDiv);
+                });
+            } catch (error) {
+                suggestionOutput.innerHTML = `<p class="text-red-400 italic fade-in p-4">Error generating ideas: ${error.message}. Please try again.</p>`;
+            }
+        }
+
         async function suggestIdeas() {
             const keywords = keywordsInput.value.trim();
             if (!keywords) {
@@ -1029,6 +1215,7 @@
             try {
                 const generatedPrompt = await fetchGeminiAPI('gemini-2.5-flash-preview-05-20', payload);
                 promptOutput.innerHTML = `<p class="output-text fade-in">${generatedPrompt.replace(/\n/g, '<br>')}</p>`;
+                promptOutput.classList.remove('hidden');
                 currentStoryText = "";
                 storyActions.classList.add('hidden');
             } catch (error) {
@@ -1040,9 +1227,12 @@
         
         async function generateStory() {
             const promptText = promptOutput.innerText.trim();
-            if (!promptText || promptOutput.children[0].id === 'promptPlaceholder') {
-                showPromptMessage('Please generate a prompt first.', '#storyOutput');
+            let sourceText = "";
+            if(promptOutput.children[0].id === 'promptPlaceholder'){
+                 showPromptMessage('Please generate a prompt first.', '#storyOutput');
                 return;
+            } else {
+                 sourceText = promptText;
             }
             
             setLoading(generateStoryBtn, true);
@@ -1055,7 +1245,7 @@
             const wordCount = WORD_COUNTS[storyLengthKey];
             const storyLanguage = document.getElementById('storyLanguage').value;
             
-            const storyGenerationPrompt = `Using the following prompt, write a story of approximately ${wordCount} words. The story must be in the ${storyLanguage} language. Prompt: "${promptText}"`;
+            const storyGenerationPrompt = `Using the following text as a basis, write a story of approximately ${wordCount} words. The story must be in the ${storyLanguage} language. Text: "${sourceText}"`;
 
             const payload = {
                 contents: [{ parts: [{ text: storyGenerationPrompt }] }],
@@ -1073,6 +1263,34 @@
                 storyActions.classList.add('hidden');
             } finally {
                 setLoading(generateStoryBtn, false);
+                setStoryLoading(false);
+            }
+        }
+
+        async function refineStory() {
+            if (!currentStoryText.trim()) {
+                showPromptMessage('Please generate a story first.', '#storyOutput');
+                return;
+            }
+
+            setLoading(refineStoryBtn, true);
+            setStoryLoading(true);
+
+            const storyLanguage = document.getElementById('storyLanguage').value;
+            const prompt = `Refine the following text to have more descriptive language, a more engaging tone, and better flow. Do not add new plot points, only improve the existing text. The text is in ${storyLanguage}. Text to refine: "${currentStoryText}"`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+            };
+            
+            try {
+                const refinedText = await fetchGeminiAPI('gemini-2.5-flash-preview-05-20', payload);
+                storyOutput.innerHTML = `<p class="output-text fade-in">${refinedText.replace(/\n/g, '<br>')}</p>`;
+                currentStoryText = refinedText;
+            } catch (error) {
+                showPromptMessage(`Error refining story: ${error.message}`, '#storyOutput');
+            } finally {
+                setLoading(refineStoryBtn, false);
                 setStoryLoading(false);
             }
         }
@@ -1193,7 +1411,7 @@
             };
 
             try {
-                const apiUrl = `${API_BASE_URL}gemini-2.5-flash-preview-tts:generateContent?key=${API_KEY}`;
+                const apiUrl = `${API_BASE_URL}gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
                 const response = await fetchWithRetry(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1257,18 +1475,37 @@
         window.addEventListener('load', () => {
             initializeFirebase();
             handleHashChange();
+            // Stagger the animation for category buttons
+            document.querySelectorAll('.category-button').forEach((btn, index) => {
+                btn.style.animationDelay = `${index * 0.05}s`;
+            });
         });
         window.addEventListener('hashchange', handleHashChange);
+        
+        // Hide header on scroll down, show on scroll up
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                // Scrolling down
+                header.classList.add('header-hidden');
+            } else {
+                // Scrolling up
+                header.classList.remove('header-hidden');
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }, false);
         
         // Save original button texts
         generatePromptBtn.dataset.originalText = generatePromptBtn.innerHTML;
         generateStoryBtn.dataset.originalText = generateStoryBtn.innerHTML;
         suggestIdeasBtn.dataset.originalText = suggestIdeasBtn.innerHTML;
+        refineStoryBtn.dataset.originalText = refineStoryBtn.innerHTML;
 
         generatePromptBtn.addEventListener('click', generatePrompt);
         generateStoryBtn.addEventListener('click', generateStory);
         suggestIdeasBtn.addEventListener('click', suggestIdeas);
         saveStoryBtn.addEventListener('click', () => saveStory(currentStoryText));
+        refineStoryBtn.addEventListener('click', refineStory);
         
         audioControlBtn.addEventListener('click', async () => {
             if (currentStoryText.trim()) {
@@ -1286,25 +1523,42 @@
         // Category button logic
         document.querySelectorAll('.category-button').forEach(btn => {
             btn.addEventListener('click', () => {
+                // Do not proceed if already active
+                if (btn.classList.contains('active')) return;
+                
                 document.querySelectorAll('.category-button').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                // You can add logic here to change story genre/audience based on category if needed
+                
                 const category = btn.dataset.category;
+                
                 if (category === 'childrensStories') {
                     document.getElementById('storyAudience').value = 'children';
-                    document.getElementById('storyFormat').value = 'prose';
+                    document.getElementById('storyFormat').value = 'short story';
                     document.getElementById('storyGenre').value = 'fantasy';
-                } else if (category === 'poems' || category === 'poetry') {
+                } else if (category === 'poems') {
+                    document.getElementById('storyAudience').value = 'general';
                     document.getElementById('storyFormat').value = 'poem';
+                    document.getElementById('storyGenre').value = 'fantasy';
                 } else if (category === 'riddles') {
+                    document.getElementById('storyAudience').value = 'general';
                     document.getElementById('storyFormat').value = 'riddle';
+                    document.getElementById('storyGenre').value = 'mystery';
                 } else if (category === 'jokes') {
+                    document.getElementById('storyAudience').value = 'general';
                     document.getElementById('storyFormat').value = 'joke';
-                } else {
+                    document.getElementById('storyGenre').value = 'comedy';
+                } else if (category === 'poetry') {
+                    document.getElementById('storyAudience').value = 'general';
+                    document.getElementById('storyFormat').value = 'poetry';
+                    document.getElementById('storyGenre').value = 'fantasy';
+                } else { // general
                     document.getElementById('storyAudience').value = 'general';
                     document.getElementById('storyFormat').value = 'prose';
                     document.getElementById('storyGenre').value = 'fantasy';
                 }
+
+                // Automatically generate ideas for the selected category
+                generateCategoryIdeas(category);
             });
         });
 
@@ -1366,3 +1620,5 @@
     </script>
 </body>
 </html>
+
+
